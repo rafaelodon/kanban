@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+	<head>		
+		<meta charset="utf-8" />		
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap-theme.min.css">
+		<link rel="stylesheet" href="index.css">
+		<script type="text/javascript" src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+		<script src="https://code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.blockUI/2.66.0-2013.10.09/jquery.blockUI.min.js"></script>			
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/masonry/3.3.2/masonry.pkgd.min.js"></script>
+		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>		
+		<script type="text/javascript" src="index.js"></script>
+	</head>
+  	<body>  		
+  		<nav class="navbar navbar-inverse navbar-fixed-top">
+	      <div class="container">
+	      		<div class="navbar-header">		        	
+			        <button type="button" class="navbar-toggle collapsed" data-toggle=	"collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+			            <span class="sr-only">Toggle navigation</span>
+			            <span class="icon-bar"></span>
+			            <span class="icon-bar"></span>
+			            <span class="icon-bar"></span>
+		          	</button>
+		          	<a class="navbar-brand" href="#">Kanban</a>
+		        </div>
+	        	<div id="navbar" class="navbar-collapse collapse">
+		        	<ul class="nav navbar-nav">			            
+			            <li>
+			            	<a id="export" href="#export">
+			            		<span class="glyphicon glyphicon-export" aria-hidden="true"></span> Export
+			            	</a>
+			           	</li>
+			           	<li>
+			            	<a id="import" href="#import">
+			            		<span class="glyphicon glyphicon-import" aria-hidden="true"></span> Import
+			            	</a>
+			           	</li>
+			        </ul>
+		        </div>
+	      </div>
+	    </nav>
+  		<div id="kanban">  			  					  	
+  			<div id="todo" class="column">
+  				<div class="header">
+  					<h2>To do</h2>
+  					<button id="btnAddTask" type="button" class="btn btn-default" aria-label="Add">
+						<span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+					</button>
+				</div>  				
+  			</div>
+  			<div id="wip" class="column">
+  				<h2>Work in Progress</h2>				  				
+  			</div>
+  			<div id="done" class="column">
+  				<h2>Done</h2>  				
+  			</div>
+  		</div>
+  		
+		<div id="modalContainer"> 
+	  		<div id="modalBackground"></div>
+			<div id="modalTask" class="modal">
+				<div style="padding: 24px; background: white">
+					<h2>Add Task</h2>					
+					<label id="labelTaskTitle">Title:</label>
+		        	<input type="text" name="title" id="inputTaskTitle" style="width: 100%"/><br/>
+		        	<br/>
+		        	<label>Description:</label>
+		        	<textarea name="description" id="inputTaskDescription" style="width: 100%; height: 60px"></textarea>
+		        	<br/>
+		        	<div style="text-align: right; margin-top: 12px">		        	
+			        	<button id="btnTaskCancel" type="button" class="btn btn-default" aria-label="Cancel">
+							<span class="glyphicon glyphicon-remove" aria-hidden="true"></span> Cancel
+						</button>
+			        	<button id="btnTaskOk" type="button" class="btn btn-default" aria-label="Ok">
+							<span class="glyphicon glyphicon-ok" aria-hidden="true"></span> Ok
+						</button>					
+					</div>
+				</div>
+			</div>		
+			<div id="modalExport" class="modal">
+				<div style="padding: 24px; background: white">
+					<h2>Export Kanban</h2>										
+		        	<label>Tasks JSON:</label>
+		        	<textarea name="exportJson" id="inputExportJson" style="width: 100%; height: 120px" readonly="true"></textarea>
+		        	<a id="linkDownloadJson" href="#" download="data.json">Download</a>
+		        	<br/>
+		        	<div style="text-align: right; margin-top: 12px">		        	
+			        	<button id="btnExportCancel" type="button" class="btn btn-default" aria-label="Cancel">
+							<span class="glyphicon glyphicon-remove" aria-hidden="true"></span> Cancel
+						</button>
+			        	<button id="btnExportOk" type="button" class="btn btn-default" aria-label="Ok">
+							<span class="glyphicon glyphicon-ok" aria-hidden="true"></span> Ok
+						</button>					
+					</div>
+				</div>
+			</div>	
+		</div>		
+	</body>
+</html>

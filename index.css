@@ -1,0 +1,134 @@
+html { 
+	height: 100%;								
+}
+
+body { 
+	height: 100%; 
+	margin: 0; 
+	padding: 0;				
+}	
+
+#kanban{	
+	width: 100%;
+	padding: 60px 0 1% 0;
+	overflow: hidden;
+	height: 100%;				
+}
+
+.column{
+	border: 1px solid #CCC;
+	float:left;
+	width: 32%;
+	margin-left: 1%;
+	padding: 1%;	
+	overflow-x: hidden;
+	overflow-y: auto;				
+	height: 100%;
+}			
+
+.task{				
+	width: 48%;
+	margin: 0 2% 2% 0;
+	padding: 12px;	
+	display: inline-block;
+	-webkit-box-shadow: 2px 2px 0px 0px rgba(0,0,0,0.2);
+	-moz-box-shadow: 2px 2px 0px 0px rgba(0,0,0,0.2);
+	box-shadow: 2px 2px 0px 0px rgba(0,0,0,0.2);				
+}
+
+.task:nth-child(even){
+	float: left;
+}
+
+h2,  h3{					
+	margin-top: 0px !important;
+}
+
+.task h3{
+	font-size: 1.2em !important;
+	font-weight: bold !important;
+	word-wrap: break-word;
+}
+
+.task p{
+	word-wrap: break-word;
+}
+
+#todo .task{
+	background-color: #FF9999;
+}
+
+#wip .task{
+	background-color: #FFFF99;
+}
+
+#done .task{
+	background-color: #99FF99;
+}
+
+.column .header{
+	overflow: hidden;
+}
+
+.column .header h2{
+	float: left;
+}
+
+.column .header button{
+	float: right;
+}
+
+.task-edit,
+.task-remove{
+	cursor: pointer;
+}
+
+.dragged{
+	opacity: 0.5;				
+}
+
+.dragging{
+	-webkit-box-shadow: 8px 8px 0px 0px rgba(0,0,0,0.2);
+	-moz-box-shadow: 8px 8px 0px 0px rgba(0,0,0,0.2);
+	box-shadow: 8px 8px 0px 0px rgba(0,0,0,0.2);
+	cursor: pointer;
+}
+
+#modalContainer{
+	display: none;
+}
+
+#modalBackground{
+	background: black;
+	opacity: 0.5;
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+}
+
+.modal{				
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 50%;
+	left: 50%;
+	margin-left: -25%;				
+	top: 25%;				
+}
+
+.required{
+	color: red;
+}
+
+.task-action{
+	display: none;
+	opacity: 0.33;
+}
+
+.navbar-brand{
+	background: url(kanban.png) no-repeat center left !important;
+	padding-left: 36px;
+	margin-left:;
+}
