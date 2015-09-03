@@ -83,15 +83,27 @@
 					<h2>Export Kanban</h2>										
 		        	<label>Tasks JSON:</label>
 		        	<textarea name="exportJson" id="inputExportJson" style="width: 100%; height: 120px" readonly="true"></textarea>
-		        	<a id="linkDownloadJson" href="#" download="data.json">Download</a>
+		        	<br/>
+		        	<div style="text-align: center; margin-top: 12px">		        	
+			        	<button id="btnExportClose" type="button" class="btn btn-default" aria-label="Cancel">
+							<span class="glyphicon glyphicon-remove" aria-hidden="true"></span> Close
+						</button>			        			
+					</div>
+				</div>
+			</div>
+			<div id="modalImport" class="modal">
+				<div style="padding: 24px; background: white">
+					<h2>Import Kanban</h2>										
+		        	<label>Tasks JSON:</label>
+		        	<textarea name="importJson" id="inputImportJson" style="width: 100%; height: 120px"></textarea>
 		        	<br/>
 		        	<div style="text-align: right; margin-top: 12px">		        	
-			        	<button id="btnExportCancel" type="button" class="btn btn-default" aria-label="Cancel">
+			        	<button id="btnImportCancel" type="button" class="btn btn-default" aria-label="Cancel">
 							<span class="glyphicon glyphicon-remove" aria-hidden="true"></span> Cancel
 						</button>
-			        	<button id="btnExportOk" type="button" class="btn btn-default" aria-label="Ok">
+			        	<button id="btnImportOk" type="button" class="btn btn-default" aria-label="Ok">
 							<span class="glyphicon glyphicon-ok" aria-hidden="true"></span> Ok
-						</button>					
+						</button>
 					</div>
 				</div>
 			</div>	

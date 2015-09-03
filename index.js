@@ -55,6 +55,18 @@ function hideModals(){
 	$("#modalContainer").hide();
 }
 
+function redrawKanban(){
+	lastTask = 0;
+	$(".task").remove();	
+	for(var t in tasks){
+		var idNum = parseInt(t.replace(/t/g,''));
+		if(idNum > lastTask){
+			lastTask = idNum;			
+		}		
+		drawTask(t);
+	};
+}
+
 dragOptions = {
 	containment: 'window',
 	helper: function(){				
@@ -134,13 +146,7 @@ $(document).ready(function (){
 	    }
 	});	
 
-	for(var t in tasks){
-		var idNum = parseInt(t.replace(/t/g,''));
-		if(idNum > lastTask){
-			lastTask = idNum;			
-		}		
-		drawTask(t);
-	};
+	redrawKanban();
 
 	$(".column").on("click", ".task-remove", function(e){ 
 		id = e.target.parentElement.id;
@@ -161,13 +167,14 @@ $(document).ready(function (){
 		currentTaskId = id;
 	});
 
-	$("#export").click(function (){
-		//var exportData = 'data:text/json;charset=utf-8,';
-		//exportData += JSON.stringify(tasks);		
-		//newWindow = window.open(encodeURI(exportData));
-		$("#inputExportJson").val(JSON.stringify(tasks));
-		$("#linkDownloadJson").attr("href", "data:" + JSON.stringify(tasks));
+	$("#export").click(function (){		
+		$("#inputExportJson").val(JSON.stringify(tasks));		
 		showModal("modalExport")
+	});
+
+	$("#import").click(function (){				
+		$("#inputImportJson").val("");
+		showModal("modalImport")
 	});
 
 	$(".column").on("mouseover", ".task", function (){
@@ -178,8 +185,29 @@ $(document).ready(function (){
 		$(this).find(".task-action").hide();
 	});	
 
-	$("#btnExportCancel").click(function (){
+	$("#btnExportClose").click(function (){
 		hideModals();
+	});
+
+	$("#btnImportCancel").click(function (){
+		hideModals();
+	});
+
+	$("#btnImportOk").click(function (){
+		try {			
+        	var tasksTemp = JSON.parse($("#inputImportJson").val());
+        	if(confirm("This Kanban tasks will be replaced by new ones. Are you sure?")){
+				tasks = tasksTemp;
+				saveTasks();
+				redrawKanban();
+        		hideModals();        		
+        		return true;
+        	}
+    	} catch (e) {
+    		alert("This is not a valid JSON.");
+    		$("#inputImportJson").focus();
+        	return false;
+    	}    			
 	});
 
 	$('.nav a').on('click', function(){ 
