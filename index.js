@@ -28,14 +28,6 @@ function saveTasks(){
 	window.localStorage.setItem(getWorkspaceName(), JSON.stringify(tasks));
 }
 
-function renderWorkspacesMenu(){
-	workspaces = JSON.parse(window.localStorage.getItem(KANBAN_WORKSPACES));	
-	for(var w in workspaces){		
-		alert(w);
-		$("#ulWorkspaces").append("<li><a href='#' id='workspace_"+w+"'>"+workspaces[w]+"</li>");
-	}
-}
-
 function initializeKanban(){
 	if(typeof window.localStorage.getItem(KANBAN_WORKSPACES) === "undefined" ||
 		window.localStorage.getItem(KANBAN_WORKSPACES) == null){
@@ -50,6 +42,13 @@ function initializeKanban(){
 		saveTasks();		
 	}else{
 		restoreTasks();	
+	}
+}
+
+function renderWorkspacesMenu(){
+	workspaces = JSON.parse(window.localStorage.getItem(KANBAN_WORKSPACES));	
+	for(var w in workspaces){				
+		$("#ulWorkspaces").append("<li><a href='#' id='workspace_"+w+"'>"+workspaces[w]+"</li>");
 	}
 }
 
