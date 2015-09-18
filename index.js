@@ -21,6 +21,7 @@ function getWorkspaceName(){
 }
 
 function restoreTasks(){
+	alert(getWorkspaceName());
 	tasks = JSON.parse(window.localStorage.getItem(getWorkspaceName()));
 }
 
@@ -47,8 +48,23 @@ function initializeKanban(){
 
 function renderWorkspacesMenu(){
 	workspaces = JSON.parse(window.localStorage.getItem(KANBAN_WORKSPACES));	
-	for(var w in workspaces){				
-		$("#ulWorkspaces").append("<li><a href='#' id='workspace_"+w+"'>"+workspaces[w]+"</li>");
+	$(".liWorkspace").remove();
+	for(var w in workspaces){		
+
+		var $a = $("<a>", {href: "#"});
+		$a.html(workspaces[w]);
+
+		$a.click(function (){
+			alert(w);
+			currentWorkspace = w;
+			restoreTasks();
+			redrawKanban();
+		});
+
+		var $li = $("<li>", {class: "liWorkspace"});
+		$li.append($a);
+
+		$("#ulWorkspaces").append($li);
 	}
 }
 
@@ -121,7 +137,15 @@ dragOptions = {
 
 $(document).ready(function (){		 				
 
-	$('.task').draggable(dragOptions);
+	$('#linkNewWorkspace').click(function (){
+		var workspaceName = prompt("New workspace name:");
+		var workspaceId = workspaceName.replace(/\s/g, '');
+		workspaces[workspaceId] = workspaceName;
+		saveWorkspaces();
+		renderWorkspacesMenu();
+	});
+
+	$('.task').draggable(dragOptions);	
 
 	$('.column').droppable({
 		drop: function(event, ui) {												
@@ -135,7 +159,7 @@ $(document).ready(function (){
 			}
 
 		}
-	});
+	});	
 
 	$("#btnAddTask").click(function (){
 		currentTaskId = null;
