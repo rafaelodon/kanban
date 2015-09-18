@@ -5,19 +5,13 @@
 		<title>Kanban</title>
 		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
 		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap-theme.min.css">
-		<link rel="stylesheet" href="index.css">
-		<script type="text/javascript" src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
-		<script src="https://code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
-		<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.blockUI/2.66.0-2013.10.09/jquery.blockUI.min.js"></script>			
-		<script src="https://cdnjs.cloudflare.com/ajax/libs/masonry/3.3.2/masonry.pkgd.min.js"></script>
-		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>		
-		<script type="text/javascript" src="index.js"></script>
+		<link rel="stylesheet" href="index.css">		
 	</head>
   	<body>  		
   		<nav class="navbar navbar-inverse navbar-fixed-top">
-	      <div class="container">
+	      <div class="container-fluid">
 	      		<div class="navbar-header">		        	
-			        <button type="button" class="navbar-toggle collapsed" data-toggle=	"collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+			        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
 			            <span class="sr-only">Toggle navigation</span>
 			            <span class="icon-bar"></span>
 			            <span class="icon-bar"></span>
@@ -29,14 +23,22 @@
 		        	<ul class="nav navbar-nav">			            
 			            <li>
 			            	<a id="export" href="#export">
-			            		<span class="glyphicon glyphicon-export" aria-hidden="true"></span> Export
+			            		<span class="glyphicon glyphicon-export"></span> Export
 			            	</a>
 			           	</li>
 			           	<li>
 			            	<a id="import" href="#import">
-			            		<span class="glyphicon glyphicon-import" aria-hidden="true"></span> Import
+			            		<span class="glyphicon glyphicon-import"></span> Import
 			            	</a>
-			           	</li>
+			           	</li>			           	
+						<li class="dropdown">
+							<a class="dropdown-toggle" data-toggle="dropdown" href="#">
+								<span class="glyphicon glyphicon-folder-open"></span> Workspace
+							</a>
+							<ul id="ulWorkspaces" class="dropdown-menu">
+								
+							</ul>
+						</li>			           	
 			        </ul>
 		        </div>
 	      </div>
@@ -109,5 +111,11 @@
 				</div>
 			</div>	
 		</div>		
+		<script type="text/javascript" src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+		<script src="https://code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.blockUI/2.66.0-2013.10.09/jquery.blockUI.min.js"></script>			
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/masonry/3.3.2/masonry.pkgd.min.js"></script>
+		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>		
+		<script type="text/javascript" src="index.js"></script>
 	</body>
 </html>

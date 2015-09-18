@@ -130,5 +130,5 @@ h2,  h3{
 .navbar-brand{
 	background: url(kanban.png) no-repeat center left !important;
 	padding-left: 36px;
-	margin-left:;
+	margin-left: 4px !important;
 }

@@ -1,25 +1,60 @@
-var TASKS = "kanban.tasks";
-var tasks = {};
+var KANBAN_WORKSPACES = "kanban.workspaces";
+var workspaces = {}
+var tasks = {}
+var currentWorkspace = "default";
 var currentTaskId = null;
 var lastTask = 1;
 var de = null;
 var para= null;
 var draggedTask = null;
 
-function saveTasks(){
-	window.localStorage.setItem(TASKS, JSON.stringify(tasks));
+function restoreWorkspaces(){
+	workspaces = JSON.parse(window.localStorage.getItem(KANBAN_WORKSPACES));
+}
+
+function saveWorkspaces(){
+	window.localStorage.setItem(KANBAN_WORKSPACES, JSON.stringify(workspaces));
+}
+
+function getWorkspaceName(){
+	return KANBAN_WORKSPACES+"."+currentWorkspace;
 }
 
 function restoreTasks(){
-	tasks = JSON.parse(window.localStorage.getItem(TASKS));
+	tasks = JSON.parse(window.localStorage.getItem(getWorkspaceName()));
 }
 
-if(typeof window.localStorage.getItem(TASKS) === "undefined" || 
-	window.localStorage.getItem(TASKS) == null){	
-	saveTasks();
-}else{
-	restoreTasks();	
+function saveTasks(){
+	window.localStorage.setItem(getWorkspaceName(), JSON.stringify(tasks));
 }
+
+function renderWorkspacesMenu(){
+	workspaces = JSON.parse(window.localStorage.getItem(KANBAN_WORKSPACES));	
+	for(var w in workspaces){		
+		alert(w);
+		$("#ulWorkspaces").append("<li><a href='#' id='workspace_"+w+"'>"+workspaces[w]+"</li>");
+	}
+}
+
+function initializeKanban(){
+	if(typeof window.localStorage.getItem(KANBAN_WORKSPACES) === "undefined" ||
+		window.localStorage.getItem(KANBAN_WORKSPACES) == null){
+		workspaces = {"default":"Default Workspace"};
+		saveWorkspaces();
+	}else{
+		restoreWorkspaces();
+	}		
+
+	if(typeof window.localStorage.getItem(getWorkspaceName()) === "undefined" || 
+		window.localStorage.getItem(getWorkspaceName()) == null){	
+		saveTasks();		
+	}else{
+		restoreTasks();	
+	}
+}
+
+initializeKanban();
+renderWorkspacesMenu();
 
 function drawTask(id){
 	var task = tasks[id];
@@ -128,14 +163,15 @@ $(document).ready(function (){
 		}	
 		
 		if(title.trim() != ''){
-			task = {"title":title, "description":description, "state":"todo"};											
-			tasks[id] = task;
-			saveTasks();
 			if(currentTaskId == null){
+				tasks[id] = {"title":title, "description":description, "state":"todo"};											
 				drawTask(id);
 			}else{
+				tasks[id].title = title;
+				tasks[id].description = description;
 				redrawTask(id);
 			}
+			saveTasks();
 			hideModals();
 			$("#labelTaskTitle").removeClass("required");
 	    	return true;
