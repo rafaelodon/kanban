@@ -1,3 +1,10 @@
+/**
+ * Kanban
+ *  
+ * Author: Rafael Odon (odon.rafael@gmail.com)
+ * Git: https://github.com/rafaelodon/kanban 
+ */
+
 var KANBAN_WORKSPACES = "kanban.workspaces";
 var workspaces = {}
 var tasks = {}
@@ -7,158 +14,52 @@ var lastTask = 1;
 var de = null;
 var para= null;
 var draggedTask = null;
+var dragOptions = {
+	containment: 'window',
+	helper: getDragTaskHelper,
+	start: onStartDragTask,
+	stop: onStopDragTask
+};
 
 $(function (){ 				
+	
+	// Drag & Drop
+	$('.task').draggable(dragOptions);	
+	$('.column').droppable({ drop: onDropTask });	
 
+	// Task actions
+	$(".column").on("click", ".task-remove", onClickRemoveTask);
+	$(".column").on("click", ".task-edit", onClickEditTask);
+	$(".column").on("mouseover", ".task", onMouseOverTask);
+	$(".column").on("mouseout", ".task", onMouseOutTask);	
+
+	// Add task bindings
+	$("#btnAddTask").click(onClickBtnAddTask);
+	$('#btnTaskCancel').click(hideModals);
+	$("#btnTaskOk").click(onClickBtnTaskOk);			
+
+	// Export bindings
+	$("#export").click(onClickExport);
+	$("#btnExportClose").click(hideModals);
+
+	// Import bindings
+	$("#import").click(onClickImport);	
+	$("#btnImportCancel").click(hideModals);
+	$("#btnImportOk").click(onClickBtnImportOk);
+
+	// Workspaces bindings
 	$('#linkNewWorkspace').click(onClickCreateNewWorkspace);
 
-	$('.task').draggable(dragOptions);	
+	// Others
+	$('.nav a').on('click', onClickNavbarLink);
 
-	$('.column').droppable({
-		drop: function(event, ui) {												
-			para = this.id;
-			if(de != para){
-				var id = $(ui.draggable).attr("id");														
-				tasks[id].state = para;								
-				drawTask(id);				
-				saveTasks();			
-				ui.draggable.remove();				
-			}
-
-		}
-	});	
-
-	$("#btnAddTask").click(function (){
-		currentTaskId = null;
-		$("#modalTask h2").html("Add Task");
-		$("#inputTaskTitle").val(null);
-		$("#inputTaskDescription").val(null);
-		showModal("modalTask")		
-		$("#inputTaskTitle").focus();
-	});
-
-
-	$('#btnTaskCancel').click(function() { 
-	   	hideModals();
-	    return false;
-	});
-
-	$("#btnTaskOk").click(function () {
-		var title = $("#inputTaskTitle").val();
-		var description = $("#inputTaskDescription").val();
-		var id = currentTaskId;
-		if(id == null){				
-			lastTask++;
-			id = "t"+(lastTask);
-		}	
-		
-		if(title.trim() != ''){
-			if(currentTaskId == null){
-				tasks[id] = {"title":title, "description":description, "state":"todo"};											
-				drawTask(id);
-			}else{
-				tasks[id].title = title;
-				tasks[id].description = description;
-				redrawTask(id);
-			}
-			saveTasks();
-			hideModals();
-			$("#labelTaskTitle").removeClass("required");
-	    	return true;
-	    }else{
-	    	$("#labelTaskTitle").addClass("required");
-	    	$("#inputTaskTitle").focus();
-	    	return false;
-	    }
-	});	
-
-	redrawKanban();
-
-	$(".column").on("click", ".task-remove", function(e){ 
-		id = e.target.parentElement.id;
-		if(confirm("Removing task '"+tasks[id].title+"'. Are you sure?")){			
-			delete tasks[id];
-			saveTasks();
-			$("#"+id).remove();
-		}
-	});
-
-	$(".column").on("click", ".task-edit", function(e){ 
-		var id = e.target.parentElement.id;
-		$("#modalTask h2").html("Edit Task");
-		$("#inputTaskTitle").val(tasks[id].title);
-		$("#inputTaskDescription").val(tasks[id].description);
-		showModal("modalTask"); 
-		$("#inputTaskTitle").focus();
-		currentTaskId = id;
-	});
-
-	$("#export").click(function (){		
-		$("#inputExportJson").val(JSON.stringify(tasks));		
-		showModal("modalExport")
-	});
-
-	$("#import").click(function (){				
-		$("#inputImportJson").val("");
-		showModal("modalImport")
-	});
-
-	$(".column").on("mouseover", ".task", function (){
-		$(this).find(".task-action").show();
-	});
-
-	$(".column").on("mouseout", ".task", function (){
-		$(this).find(".task-action").hide();
-	});	
-
-	$("#btnExportClose").click(function (){
-		hideModals();
-	});
-
-	$("#btnImportCancel").click(function (){
-		hideModals();
-	});
-
-	$("#btnImportOk").click(function (){
-		try {			
-        	var tasksTemp = JSON.parse($("#inputImportJson").val());
-        	if(confirm("This Kanban tasks will be replaced by new ones. Are you sure?")){
-				tasks = tasksTemp;
-				saveTasks();
-				redrawKanban();
-        		hideModals();        		
-        		return true;
-        	}
-    	} catch (e) {
-    		alert("This is not a valid JSON.");
-    		$("#inputImportJson").focus();
-        	return false;
-    	}    			
-	});
-
-	$('.nav a').on('click', function(){ 
-        if($('.navbar-toggle').css('display') !='none'){
-            $(".navbar-toggle").trigger( "click" );
-        }
-    });
-
-    $(window).bind('beforeunload', function() {    	
-        saveTasks();
-        return "Salvando tarefas...";	    
-	});
+	initializeKanbanData();
+	renderWorkspacesMenu();
+	redrawKanban();	
 
 });
 
-function onClickCreateNewWorkspace(){
-	alert(false);
-	var workspaceName = prompt("New workspace name:");
-	if(workspaceName){
-		var workspaceId = workspaceName.replace(/\s/g, '');
-		workspaces[workspaceId] = workspaceName;
-		saveWorkspaces();
-		renderWorkspacesMenu();
-	}
-}
+/* General functions */
 
 function restoreWorkspaces(){
 	workspaces = JSON.parse(window.localStorage.getItem(KANBAN_WORKSPACES));
@@ -172,8 +73,7 @@ function getWorkspaceName(){
 	return KANBAN_WORKSPACES+"."+currentWorkspace;
 }
 
-function restoreTasks(){
-	alert(getWorkspaceName());
+function restoreTasks(){	
 	tasks = JSON.parse(window.localStorage.getItem(getWorkspaceName()));
 }
 
@@ -181,7 +81,7 @@ function saveTasks(){
 	window.localStorage.setItem(getWorkspaceName(), JSON.stringify(tasks));
 }
 
-function initializeKanban(){
+function initializeKanbanData(){
 	if(typeof window.localStorage.getItem(KANBAN_WORKSPACES) === "undefined" ||
 		window.localStorage.getItem(KANBAN_WORKSPACES) == null){
 		workspaces = {"default":"Default Workspace"};
@@ -207,8 +107,8 @@ function renderWorkspacesMenu(){
 		$a.html(workspaces[w]);
 
 		$a.click(function (){
-			alert(w);
 			currentWorkspace = w;
+			alert(currentWorkspace);
 			restoreTasks();
 			redrawKanban();
 		});
@@ -219,9 +119,6 @@ function renderWorkspacesMenu(){
 		$("#ulWorkspaces").append($li);
 	}
 }
-
-initializeKanban();
-renderWorkspacesMenu();
 
 function drawTask(id){
 	var task = tasks[id];
@@ -240,11 +137,6 @@ function redrawTask(id){
 	$div.find("h3").html(task.title);
 	$div.find("p").html(task.description);
 }
-
-function downloadJson(){
-	return "data:" + JSON.stringify(tasks);
-}
-
 
 function showModal(m){
 	$("#modalContainer").find(".modal").hide();
@@ -269,20 +161,144 @@ function redrawKanban(){
 	};
 }
 
-dragOptions = {
-	containment: 'window',
-	helper: function(){				
-		clone = $(this).clone();
-		clone.addClass('dragging');
-		clone.width($(this).outerWidth());
-		return clone;
-	},
-	start: function( event, ui ) {
-		draggedTask = event.currentTarget;
-		de = draggedTask.parentElement.id;
-		$(draggedTask).addClass('dragged');
-	},
-	stop: function (event, ui) {						
-		$(draggedTask).removeClass('dragged');	
+/* Drag events */
+
+function getDragTaskHelper(){				
+	clone = $(this).clone();
+	clone.addClass('dragging');
+	clone.width($(this).outerWidth());
+	return clone;
+}
+
+function onStartDragTask( event, ui ) {
+	draggedTask = event.currentTarget;
+	de = draggedTask.parentElement.id;
+	$(draggedTask).addClass('dragged');
+}
+
+function onStopDragTask(event, ui) {						
+	$(draggedTask).removeClass('dragged');	
+}
+
+function onDropTask(event, ui) {												
+	para = this.id;
+	if(de != para){
+		var id = $(ui.draggable).attr("id");														
+		tasks[id].state = para;								
+		drawTask(id);				
+		saveTasks();			
+		ui.draggable.remove();				
 	}
-};
+}
+
+/* Events */
+
+function onClickBtnAddTask(){
+	currentTaskId = null;
+	$("#modalTask h2").html("Add Task");
+	$("#inputTaskTitle").val(null);
+	$("#inputTaskDescription").val(null);
+	showModal("modalTask")		
+	$("#inputTaskTitle").focus();
+}
+
+function onClickCreateNewWorkspace(){
+	alert(false);
+	var workspaceName = prompt("New workspace name:");
+	if(workspaceName){
+		var workspaceId = workspaceName.replace(/\s/g, '');
+		workspaces[workspaceId] = workspaceName;
+		saveWorkspaces();
+		renderWorkspacesMenu();
+	}
+}
+
+function onClickBtnTaskOk() {
+	var title = $("#inputTaskTitle").val();
+	var description = $("#inputTaskDescription").val();
+	var id = currentTaskId;
+	if(id == null){				
+		lastTask++;
+		id = "t"+(lastTask);
+	}	
+	
+	if(title.trim() != ''){
+		if(currentTaskId == null){
+			tasks[id] = {"title":title, "description":description, "state":"todo"};											
+			drawTask(id);
+		}else{
+			tasks[id].title = title;
+			tasks[id].description = description;
+			redrawTask(id);
+		}
+		saveTasks();
+		hideModals();
+		$("#labelTaskTitle").removeClass("required");
+    	return true;
+    }else{
+    	$("#labelTaskTitle").addClass("required");
+    	$("#inputTaskTitle").focus();
+    	return false;
+    }
+}
+
+function onClickRemoveTask(e){ 
+	id = e.target.parentElement.id;
+	if(confirm("Removing task '"+tasks[id].title+"'. Are you sure?")){			
+		delete tasks[id];
+		saveTasks();
+		$("#"+id).remove();
+	}
+}
+
+function onClickEditTask(e){ 
+	var id = e.target.parentElement.id;
+	$("#modalTask h2").html("Edit Task");
+	$("#inputTaskTitle").val(tasks[id].title);
+	$("#inputTaskDescription").val(tasks[id].description);
+	showModal("modalTask"); 
+	$("#inputTaskTitle").focus();
+	currentTaskId = id;
+}
+
+function onClickExport(){		
+	$("#inputExportJson").val(JSON.stringify(tasks));		
+	showModal("modalExport")
+}
+
+function onClickImport(){				
+	$("#inputImportJson").val("");
+	showModal("modalImport")
+}
+
+function onMouseOverTask(){
+	$(this).find(".task-action").show();
+}
+
+function onMouseOutTask(){
+	$(this).find(".task-action").hide();
+}
+
+function onClickBtnImportOk(){
+	try {			
+    	var tasksTemp = JSON.parse($("#inputImportJson").val());
+    	if(confirm("This Kanban tasks will be replaced by new ones. Are you sure?")){
+			tasks = tasksTemp;
+			saveTasks();
+			redrawKanban();
+    		hideModals();        		
+    		return true;
+    	}
+	} catch (e) {
+		alert("This is not a valid JSON.");
+		$("#inputImportJson").focus();
+    	return false;
+	}    			
+}
+
+function onClickNavbarLink(){ 
+	// Hides the collapsed navbar once a link gets clicked
+    if($('.navbar-toggle').css('display') !='none'){
+        $(".navbar-toggle").trigger( "click" );
+    }
+}
