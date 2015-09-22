@@ -202,9 +202,8 @@ function onClickBtnAddTask(){
 	$("#inputTaskTitle").focus();
 }
 
-function onClickCreateNewWorkspace(){
-	alert(false);
-	var workspaceName = prompt("New workspace name:");
+function onClickCreateNewWorkspace(){	
+	var workspaceName = prompt(MESSAGES["workspace_new"]);
 	if(workspaceName){
 		var workspaceId = workspaceName.replace(/\s/g, '');
 		workspaces[workspaceId] = workspaceName;
@@ -244,7 +243,7 @@ function onClickBtnTaskOk() {
 
 function onClickRemoveTask(e){ 
 	id = e.target.parentElement.id;
-	if(confirm("Removing task '"+tasks[id].title+"'. Are you sure?")){			
+	if(confirm(message("confirm_remove_task",tasks[id].title))){			
 		delete tasks[id];
 		saveTasks();
 		$("#"+id).remove();
