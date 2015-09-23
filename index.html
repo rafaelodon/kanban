@@ -9,44 +9,34 @@
 	</head>
   	<body>  		
   		<nav class="navbar navbar-inverse navbar-fixed-top">
-	      <div class="container-fluid">
-	      		<div class="navbar-header">		        	
-			        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
-			            <span class="sr-only">Toggle navigation</span>
-			            <span class="icon-bar"></span>
-			            <span class="icon-bar"></span>
-			            <span class="icon-bar"></span>
-		          	</button>
-		          	<a class="navbar-brand" href="#"><span id="title"></span></a>		          			          	
-		        </div>
-	        	<div id="navbar" class="navbar-collapse collapse">
-		        	<ul class="nav navbar-nav" id="menu">			            
-		        		<li class="dropdown">
-							<a class="dropdown-toggle" data-toggle="dropdown" href="#">
-								<span class="glyphicon glyphicon-folder-open"></span> Workspace
-							</a>							
-							<ul id="ulWorkspaces" class="dropdown-menu">
-								<li>
-									<a href="#" id="linkNewWorkspace">
-										<span class="glyphicon glyphicon-plus"></span> New Workspace...
-									</a>
-								</li>								
-								<li style="border-bottom: 1px solid black"></li>
-							</ul>
-						</li>
-			            <li>
-			            	<a id="export" href="#export">
-			            		<span class="glyphicon glyphicon-export"></span> Export
-			            	</a>
-			           	</li>
-			           	<li>
-			            	<a id="import" href="#import">
-			            		<span class="glyphicon glyphicon-import"></span> Import
-			            	</a>
-			           	</li>			           										           	
-			        </ul>
-		        </div>
-	      </div>
+		    <div class="container-fluid">
+		        <a class="navbar-brand" href="#"><span id="title"></span></a>
+	        	<ul class="nav navbar-nav" id="menu">			            
+	        		<li class="dropdown">
+						<a class="dropdown-toggle" data-toggle="dropdown" href="#">
+							<span class="glyphicon glyphicon-folder-open"></span> Workspace
+						</a>							
+						<ul id="ulWorkspaces" class="dropdown-menu">
+							<li>
+								<a href="#" id="linkNewWorkspace">
+									<span class="glyphicon glyphicon-plus"></span> New Workspace...
+								</a>
+							</li>								
+							<li style="border-bottom: 1px solid black"></li>
+						</ul>
+					</li>
+		            <li>
+		            	<a id="export" href="#export">
+		            		<span class="glyphicon glyphicon-export"></span> Export
+		            	</a>
+		           	</li>
+		           	<li>
+		            	<a id="import" href="#import">
+		            		<span class="glyphicon glyphicon-import"></span> Import
+		            	</a>
+		           	</li>			           										           	
+		        </ul>
+			</div>
 	    </nav>
   		<div id="kanban">  			  					  	
   			<div id="todo" class="column">
