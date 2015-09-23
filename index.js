@@ -1,8 +1,8 @@
 /**
  * Kanban
- *  
+ * 
  * Author: Rafael Odon (odon.rafael@gmail.com)
- * Git: https://github.com/rafaelodon/kanban 
+ * Git: https://github.com/rafaelodon/kanban
  */
 
 var KANBAN_WORKSPACES = "kanban.workspaces";
@@ -103,15 +103,10 @@ function renderWorkspacesMenu(){
 	$(".liWorkspace").remove();
 	for(var w in workspaces){		
 
-		var $a = $("<a>", {href: "#"});
+		var $a = $("<a>", {href: "#", id: w});
 		$a.html(workspaces[w]);
 
-		$a.click(function (){
-			currentWorkspace = w;
-			alert(currentWorkspace);
-			restoreTasks();
-			redrawKanban();
-		});
+		$a.click(onSelectWorkspace);
 
 		var $li = $("<li>", {class: "liWorkspace"});
 		$li.append($a);
@@ -150,8 +145,15 @@ function hideModals(){
 }
 
 function redrawKanban(){
-	lastTask = 0;
+	
+	lastTask = 0;	
+	
+	var title = "Kanban - "+workspaces[currentWorkspace];	
+	document.title = title;
+	$("#title").html(title);
+
 	$(".task").remove();	
+
 	for(var t in tasks){
 		var idNum = parseInt(t.replace(/t/g,''));
 		if(idNum > lastTask){
@@ -281,7 +283,7 @@ function onMouseOutTask(){
 function onClickBtnImportOk(){
 	try {			
     	var tasksTemp = JSON.parse($("#inputImportJson").val());
-    	if(confirm("This Kanban tasks will be replaced by new ones. Are you sure?")){
+    	if(confirm(message("confirm_import_tasks"))){
 			tasks = tasksTemp;
 			saveTasks();
 			redrawKanban();
@@ -289,7 +291,7 @@ function onClickBtnImportOk(){
     		return true;
     	}
 	} catch (e) {
-		alert("This is not a valid JSON.");
+		alert(message("error_invalid_json"));
 		$("#inputImportJson").focus();
     	return false;
 	}    			
@@ -300,4 +302,10 @@ function onClickNavbarLink(){
     if($('.navbar-toggle').css('display') !='none'){
         $(".navbar-toggle").trigger( "click" );
     }
+}
+
+function onSelectWorkspace(){			
+	currentWorkspace = $(this).attr("id");			
+	restoreTasks();
+	redrawKanban();
 }

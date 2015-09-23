@@ -1,6 +1,8 @@
 var MESSAGES = {
-	"workspace_new":"New workspace name teste:",
+	"workspace_new":"New workspace name:",
 	"confirm_remove_task":"Removing task {1}. Are you sure?",
+	"confirm_import_tasks":"All tasks from the current workspace are going to be replaced by new ones. Are you sure?",
+	"error_invalid_json":"This is not a valid JSON.",
 }
 
 function message(key){

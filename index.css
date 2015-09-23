@@ -130,9 +130,14 @@ h2,  h3{
 .navbar-brand{
 	background: url(kanban.png) no-repeat center left !important;
 	padding-left: 36px;
-	margin-left: 4px !important;
+	margin-left: 4px !important;	
+}
+
+#menu{
+	float: right;
 }
 
 .liWorkspace a{
 	padding-left: 38px !important;	
 }
+
