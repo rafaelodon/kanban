@@ -8,8 +8,8 @@
 		<link rel="stylesheet" href="index.css">		
 	</head>
   	<body>  		
-  		<nav class="navbar navbar-inverse navbar-fixed-top">
-		    <div class="container-fluid">
+  		<div id="container">
+	  		<nav class="navbar navbar-inverse navbar-fixed-top">		    
 		        <a class="navbar-brand" href="#"><span id="title"></span></a>
 	        	<ul class="nav navbar-nav" id="menu">			            
 	        		<li class="dropdown">
@@ -35,77 +35,76 @@
 		            		<span class="glyphicon glyphicon-import"></span> Import
 		            	</a>
 		           	</li>			           										           	
-		        </ul>
-			</div>
-	    </nav>
-  		<div id="kanban">  			  					  	
-  			<div id="todo" class="column">
-  				<div class="header">
-  					<h2>To do</h2>
-  					<button id="btnAddTask" type="button" class="btn btn-default" aria-label="Add">
-						<span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
-					</button>
-				</div>  				
-  			</div>
-  			<div id="wip" class="column">
-  				<h2>Work in Progress</h2>				  				
-  			</div>
-  			<div id="done" class="column">
-  				<h2>Done</h2>  				
-  			</div>
-  		</div>
-  		
-		<div id="modalContainer"> 
-	  		<div id="modalBackground"></div>
-			<div id="modalTask" class="modal">
-				<div style="padding: 24px; background: white">
-					<h2>Add Task</h2>					
-					<label id="labelTaskTitle">Title:</label>
-		        	<input type="text" name="title" id="inputTaskTitle" style="width: 100%"/><br/>
-		        	<br/>
-		        	<label>Description:</label>
-		        	<textarea name="description" id="inputTaskDescription" style="width: 100%; height: 60px"></textarea>
-		        	<br/>
-		        	<div style="text-align: right; margin-top: 12px">		        	
-			        	<button id="btnTaskCancel" type="button" class="btn btn-default" aria-label="Cancel">
-							<span class="glyphicon glyphicon-remove" aria-hidden="true"></span> Cancel
+		        </ul>			
+		    </nav>
+	  		<div id="kanban">  			  					  	
+	  			<div id="todo" class="column">
+	  				<div class="header">
+	  					<h2>To do</h2>
+	  					<button id="btnAddTask" type="button" class="btn btn-default" aria-label="Add">
+							<span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
 						</button>
-			        	<button id="btnTaskOk" type="button" class="btn btn-default" aria-label="Ok">
-							<span class="glyphicon glyphicon-ok" aria-hidden="true"></span> Ok
-						</button>					
+					</div>  				
+	  			</div>
+	  			<div id="wip" class="column">
+	  				<h2>Work in Progress</h2>				  				
+	  			</div>
+	  			<div id="done" class="column">
+	  				<h2>Done</h2>  				
+	  			</div>
+	  		</div>  		
+			<div id="modalContainer"> 
+		  		<div id="modalBackground"></div>
+				<div id="modalTask" class="modal">
+					<div style="padding: 24px; background: white">
+						<h2>Add Task</h2>					
+						<label id="labelTaskTitle">Title:</label>
+			        	<input type="text" name="title" id="inputTaskTitle" style="width: 100%"/><br/>
+			        	<br/>
+			        	<label>Description:</label>
+			        	<textarea name="description" id="inputTaskDescription" style="width: 100%; height: 60px"></textarea>
+			        	<br/>
+			        	<div style="text-align: right; margin-top: 12px">		        	
+				        	<button id="btnTaskCancel" type="button" class="btn btn-default" aria-label="Cancel">
+								<span class="glyphicon glyphicon-remove" aria-hidden="true"></span> Cancel
+							</button>
+				        	<button id="btnTaskOk" type="button" class="btn btn-default" aria-label="Ok">
+								<span class="glyphicon glyphicon-ok" aria-hidden="true"></span> Ok
+							</button>					
+						</div>
+					</div>
+				</div>		
+				<div id="modalExport" class="modal">
+					<div style="padding: 24px; background: white">
+						<h2>Export Workspace Tasks</h2>										
+			        	<label>Tasks JSON:</label>
+			        	<textarea name="exportJson" id="inputExportJson" style="width: 100%; height: 120px" readonly="true"></textarea>
+			        	<br/>
+			        	<div style="text-align: center; margin-top: 12px">		        	
+				        	<button id="btnExportClose" type="button" class="btn btn-default" aria-label="Cancel">
+								<span class="glyphicon glyphicon-remove" aria-hidden="true"></span> Close
+							</button>			        			
+						</div>
 					</div>
 				</div>
+				<div id="modalImport" class="modal">
+					<div style="padding: 24px; background: white">
+						<h2>Import Tasks into Workspace</h2>										
+			        	<label>Tasks JSON:</label>
+			        	<textarea name="importJson" id="inputImportJson" style="width: 100%; height: 120px"></textarea>
+			        	<br/>
+			        	<div style="text-align: right; margin-top: 12px">		        	
+				        	<button id="btnImportCancel" type="button" class="btn btn-default" aria-label="Cancel">
+								<span class="glyphicon glyphicon-remove" aria-hidden="true"></span> Cancel
+							</button>
+				        	<button id="btnImportOk" type="button" class="btn btn-default" aria-label="Ok">
+								<span class="glyphicon glyphicon-ok" aria-hidden="true"></span> Ok
+							</button>
+						</div>
+					</div>
+				</div>	
 			</div>		
-			<div id="modalExport" class="modal">
-				<div style="padding: 24px; background: white">
-					<h2>Export Workspace Tasks</h2>										
-		        	<label>Tasks JSON:</label>
-		        	<textarea name="exportJson" id="inputExportJson" style="width: 100%; height: 120px" readonly="true"></textarea>
-		        	<br/>
-		        	<div style="text-align: center; margin-top: 12px">		        	
-			        	<button id="btnExportClose" type="button" class="btn btn-default" aria-label="Cancel">
-							<span class="glyphicon glyphicon-remove" aria-hidden="true"></span> Close
-						</button>			        			
-					</div>
-				</div>
-			</div>
-			<div id="modalImport" class="modal">
-				<div style="padding: 24px; background: white">
-					<h2>Import Tasks into Workspace</h2>										
-		        	<label>Tasks JSON:</label>
-		        	<textarea name="importJson" id="inputImportJson" style="width: 100%; height: 120px"></textarea>
-		        	<br/>
-		        	<div style="text-align: right; margin-top: 12px">		        	
-			        	<button id="btnImportCancel" type="button" class="btn btn-default" aria-label="Cancel">
-							<span class="glyphicon glyphicon-remove" aria-hidden="true"></span> Cancel
-						</button>
-			        	<button id="btnImportOk" type="button" class="btn btn-default" aria-label="Ok">
-							<span class="glyphicon glyphicon-ok" aria-hidden="true"></span> Ok
-						</button>
-					</div>
-				</div>
-			</div>	
-		</div>		
+		</div>
 		<script type="text/javascript" src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
 		<script src="https://code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.blockUI/2.66.0-2013.10.09/jquery.blockUI.min.js"></script>			
