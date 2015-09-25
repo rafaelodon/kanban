@@ -1,7 +1,9 @@
 var MESSAGES = {
 	"workspace_new":"New workspace name:",
+	"workspace_rename":"Inform a new name to the current workspace:",	
+	"confirm_workspace_remove":"Removing workspace {1} and all its tasks. Are you sure?", 
 	"confirm_remove_task":"Removing task {1}. Are you sure?",
-	"confirm_import_tasks":"All tasks from the current workspace are going to be replaced by new ones. Are you sure?",
+	"confirm_import_tasks":"All tasks from the current workspace will be be replaced by new ones. Are you sure?",
 	"error_invalid_json":"This is not a valid JSON.",
 }
 

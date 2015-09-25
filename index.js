@@ -6,9 +6,11 @@
  */
 
 var KANBAN_WORKSPACES = "kanban.workspaces";
+var KANBAN_DEFAULT_WORKSPACE_ID = "default";
+var KANBAN_DEFAULT_WORKSPACE_NAME = "Default Workspace";
 var workspaces = {}
 var tasks = {}
-var currentWorkspace = "default";
+var currentWorkspace = KANBAN_DEFAULT_WORKSPACE_ID;
 var currentTaskId = null;
 var lastTask = 1;
 var de = null;
@@ -49,6 +51,8 @@ $(function (){
 
 	// Workspaces bindings
 	$('#linkNewWorkspace').click(onClickCreateNewWorkspace);
+	$('#linkRenameWorkspace').click(onClickRenameWorkspace);
+	$('#linkRemoveWorkspace').click(onClickRemoveWorkspace);
 
 	// Others
 	$('.nav a').on('click', onClickNavbarLink);
@@ -69,30 +73,36 @@ function saveWorkspaces(){
 	window.localStorage.setItem(KANBAN_WORKSPACES, JSON.stringify(workspaces));
 }
 
-function getWorkspaceName(){
-	return KANBAN_WORKSPACES+"."+currentWorkspace;
+function getWorkspaceName(workspaceId){
+	return KANBAN_WORKSPACES+"."+workspaceId;
 }
 
-function restoreTasks(){	
-	tasks = JSON.parse(window.localStorage.getItem(getWorkspaceName()));
+function restoreTasks(){
+	tasks = JSON.parse(window.localStorage.getItem(getWorkspaceName(currentWorkspace)));
+	if(tasks == null || tasks === "undefined"){
+		tasks = {};
+	}
 }
 
 function saveTasks(){
-	window.localStorage.setItem(getWorkspaceName(), JSON.stringify(tasks));
+	window.localStorage.setItem(getWorkspaceName(currentWorkspace), JSON.stringify(tasks));
 }
 
 function initializeKanbanData(){
 	if(typeof window.localStorage.getItem(KANBAN_WORKSPACES) === "undefined" ||
-		window.localStorage.getItem(KANBAN_WORKSPACES) == null){
-		workspaces = {"default":"Default Workspace"};
+		window.localStorage.getItem(KANBAN_WORKSPACES) == null || 
+		window.localStorage.getItem(KANBAN_WORKSPACES) == "{}"){
+		workspaces = {};
+		workspaces[KANBAN_DEFAULT_WORKSPACE_ID] = KANBAN_DEFAULT_WORKSPACE_NAME;
 		saveWorkspaces();
 	}else{
 		restoreWorkspaces();
 	}		
 
-	if(typeof window.localStorage.getItem(getWorkspaceName()) === "undefined" || 
-		window.localStorage.getItem(getWorkspaceName()) == null){	
-		saveTasks();		
+	if(typeof window.localStorage.getItem(getWorkspaceName(currentWorkspace)) === "undefined" || 
+		window.localStorage.getItem(getWorkspaceName(currentWorkspace)) == null){	
+		tasks = {};
+		saveTasks();	
 	}else{
 		restoreTasks();	
 	}
@@ -100,6 +110,15 @@ function initializeKanbanData(){
 
 function renderWorkspacesMenu(){
 	workspaces = JSON.parse(window.localStorage.getItem(KANBAN_WORKSPACES));	
+
+	if(currentWorkspace == KANBAN_DEFAULT_WORKSPACE_ID){
+		$("#linkRemoveWorkspace").hide();
+		$("#linkRenameWorkspace").hide();
+	}else{
+		$("#linkRemoveWorkspace").show();
+		$("#linkRenameWorkspace").show();
+	}
+
 	$(".liWorkspace").remove();
 	for(var w in workspaces){		
 
@@ -205,14 +224,44 @@ function onClickBtnAddTask(){
 }
 
 function onClickCreateNewWorkspace(){	
-	var workspaceName = prompt(MESSAGES["workspace_new"]);
+	var workspaceName = prompt(message("workspace_new"));
 	if(workspaceName){
-		var workspaceId = workspaceName.replace(/\s/g, '');
-		workspaces[workspaceId] = workspaceName;
+		var workspaceId = generateWorkspaceId();
+		workspaces[workspaceId] = workspaceName;		
 		saveWorkspaces();
-		renderWorkspacesMenu();
+		renderWorkspacesMenu();		
+		switchToWorkspace(workspaceId);
 	}
 }
+
+function generateWorkspaceId(){
+	return new Date().getTime();
+}
+
+function onClickRenameWorkspace(){	
+	var newWorkspaceName = prompt(message("workspace_rename"));
+	if(newWorkspaceName){		
+		workspaces[workspaceId] = newWorkspaceName;
+		saveWorkspaces();		
+		redrawKanban();
+	}
+}
+
+function onClickRemoveWorkspace(){
+	if(confirm(message("confirm_workspace_remove",workspaces[currentWorkspace]))){
+		//remove old workspace
+		removeWorkspace(currentWorkspace);
+		renderWorkspacesMenu();
+		switchToWorkspace(KANBAN_DEFAULT_WORKSPACE_ID);
+	}
+}
+
+function removeWorkspace(workspaceId){	
+	window.localStorage.setItem(getWorkspaceName(workspaceId),"undefined");
+	delete workspaces[workspaceId];
+	saveWorkspaces();	
+}
+
 
 function onClickBtnTaskOk() {
 	var title = $("#inputTaskTitle").val();
@@ -305,7 +354,12 @@ function onClickNavbarLink(){
 }
 
 function onSelectWorkspace(){			
-	currentWorkspace = $(this).attr("id");			
-	restoreTasks();
+	switchToWorkspace($(this).attr("id"));	
+}
+
+function switchToWorkspace(workspaceId){
+	currentWorkspace = workspaceId;
+	initializeKanbanData();	
+	renderWorkspacesMenu();
 	redrawKanban();
 }
