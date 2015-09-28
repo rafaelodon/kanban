@@ -17,11 +17,21 @@ html, body, #container {
 	float:left;
 	width: 32%;
 	margin-left: 1%;
-	padding: 1%;	
-	overflow-x: hidden;
-	overflow-y: auto;				
+	padding: 1%;		
 	height: 100%;
-}			
+}
+
+
+.column .header{
+	height: 10%;
+}
+
+.column .tasksarea{
+	width: 100%;
+	height: 90%;
+	overflow-x: hidden;
+	overflow-y: auto;	
+}
 
 .task{				
 	width: 48%;
@@ -33,33 +43,34 @@ html, body, #container {
 	box-shadow: 2px 2px 0px 0px rgba(0,0,0,0.2);				
 }
 
-.task:nth-child(even){
-	float: left;
-}
-
 h2,  h3{					
 	margin-top: 0px !important;
 }
 
 .task h3{
-	font-size: 1.2em !important;
+	font-size: 1em !important;
 	font-weight: bold !important;
 	word-wrap: break-word;
+	height: 2em;
+	line-height: 1em;
 }
 
 .task p{
-	word-wrap: break-word;
+	height: 2em;
+	width: 100%;	
+	font-size: 0.9em;
+	line-height: 1em;
 }
 
-#todo .task{
+.red .task{
 	background-color: #FF9999;
 }
 
-#wip .task{
+.yellow .task{
 	background-color: #FFFF99;
 }
 
-#done .task{
+.green .task{
 	background-color: #99FF99;
 }
 

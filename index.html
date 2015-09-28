@@ -40,23 +40,30 @@
 		            	<a id="import" href="#import">
 		            		<span class="glyphicon glyphicon-import"></span> Import
 		            	</a>
-		           	</li>			           										           	
+		           	</li>
 		        </ul>			
 		    </nav>
 	  		<div id="kanban">  			  					  	
-	  			<div id="todo" class="column">
+	  			<div class="column">
 	  				<div class="header">
 	  					<h2>To do</h2>
 	  					<button id="btnAddTask" type="button" class="btn btn-default" aria-label="Add">
 							<span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
 						</button>
-					</div>  				
+					</div>  			
+					<div id="todo" kanban-column-id="todo" class="tasksarea red"></div>	
 	  			</div>
-	  			<div id="wip" class="column">
-	  				<h2>Work in Progress</h2>				  				
+	  			<div class="column">
+	  				<div class="header">
+	  					<h2>Work in Progress</h2>				  				
+	  				</div>
+	  				<div kanban-column-id="wip" class="tasksarea yellow"></div>
 	  			</div>
-	  			<div id="done" class="column">
-	  				<h2>Done</h2>  				
+	  			<div class="column">
+	  				<div class="header">
+	  					<h2>Done</h2>
+	  				</div>
+	  				<div kanban-column-id="done" class="tasksarea green"></div>
 	  			</div>
 	  		</div>  		
 			<div id="modalContainer"> 
@@ -115,7 +122,8 @@
 		<script src="https://code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.blockUI/2.66.0-2013.10.09/jquery.blockUI.min.js"></script>			
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/masonry/3.3.2/masonry.pkgd.min.js"></script>
-		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>		
+		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/jQuery.dotdotdot/1.7.4/jquery.dotdotdot.min.js"></script>
 		<script type="text/javascript" src="messages.js"></script>
 		<script type="text/javascript" src="index.js"></script>
 	</body>

@@ -20,20 +20,23 @@ var dragOptions = {
 	containment: 'window',
 	helper: getDragTaskHelper,
 	start: onStartDragTask,
-	stop: onStopDragTask
+	stop: onStopDragTask	
 };
+var ellipsisOptions = {
+	ellipsis : "..."
+}
 
 $(function (){ 				
 	
 	// Drag & Drop
 	$('.task').draggable(dragOptions);	
-	$('.column').droppable({ drop: onDropTask });	
+	$('.tasksarea').droppable({ drop: onDropTask });	
 
 	// Task actions
-	$(".column").on("click", ".task-remove", onClickRemoveTask);
-	$(".column").on("click", ".task-edit", onClickEditTask);
-	$(".column").on("mouseover", ".task", onMouseOverTask);
-	$(".column").on("mouseout", ".task", onMouseOutTask);	
+	$(".tasksarea").on("click", ".task-remove", onClickRemoveTask);
+	$(".tasksarea").on("click", ".task-edit", onClickEditTask);
+	$(".tasksarea").on("mouseover", ".task", onMouseOverTask);
+	$(".tasksarea").on("mouseout", ".task", onMouseOutTask);	
 
 	// Add task bindings
 	$("#btnAddTask").click(onClickBtnAddTask);
@@ -60,7 +63,7 @@ $(function (){
 	initializeKanbanData();
 	renderWorkspacesMenu();
 	redrawKanban();	
-
+	
 });
 
 /* General functions */
@@ -136,13 +139,14 @@ function renderWorkspacesMenu(){
 
 function drawTask(id){
 	var task = tasks[id];
-	var $div = $("<div>", {id: id, class: "task"});
+	var $div = $("<div>", {id: id, class: "task"});	
 	$div.append("<h3>"+task.title+"</h3>");
 	$div.append("<p>"+task.description+"</p>");
 	$div.append("<span class='task-action task-edit glyphicon glyphicon-pencil' aria-hidden='true'></span>&nbsp;");
 	$div.append("<span class='task-action task-remove glyphicon glyphicon-remove' aria-hidden='true'></span>");
-	$div.draggable(dragOptions);
-	$("#"+task.state).append($div);
+	$div.draggable(dragOptions);	
+	$("div[kanban-column-id="+task.state+"]").append($div);
+	$("#"+id+" p, #"+id+" h3").dotdotdot(ellipsisOptions);	
 }
 
 function redrawTask(id){
@@ -193,7 +197,7 @@ function getDragTaskHelper(){
 
 function onStartDragTask( event, ui ) {
 	draggedTask = event.currentTarget;
-	de = draggedTask.parentElement.id;
+	de = $(draggedTask.parentElement).attr("kanban-column-id");	
 	$(draggedTask).addClass('dragged');
 }
 
@@ -202,7 +206,7 @@ function onStopDragTask(event, ui) {
 }
 
 function onDropTask(event, ui) {												
-	para = this.id;
+	para = $(this).attr("kanban-column-id");	
 	if(de != para){
 		var id = $(ui.draggable).attr("id");														
 		tasks[id].state = para;								
