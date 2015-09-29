@@ -75,7 +75,6 @@ function restoreLastWorkspace(){
 		window.localStorage.getItem(KANBAN_LAST_WORKSPACE) != null &&
 		window.localStorage.getItem(KANBAN_LAST_WORKSPACE) in workspaces){		
 		currentWorkspace = window.localStorage.getItem(KANBAN_LAST_WORKSPACE);
-		alert(currentWorkspace);
 	}
 }
 
