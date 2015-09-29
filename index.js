@@ -6,6 +6,7 @@
  */
 
 var KANBAN_WORKSPACES = "kanban.workspaces";
+var KANBAN_LAST_WORKSPACE = "kanban.lastWorkspace";
 var KANBAN_DEFAULT_WORKSPACE_ID = "default";
 var KANBAN_DEFAULT_WORKSPACE_NAME = "Default Workspace";
 var workspaces = {}
@@ -23,10 +24,11 @@ var dragOptions = {
 	stop: onStopDragTask	
 };
 var ellipsisOptions = {
-	ellipsis : "..."
-}
+	ellipsis : "...",
+	watch: "window"
+};
 
-$(function (){ 				
+$(function (){
 	
 	// Drag & Drop
 	$('.task').draggable(dragOptions);	
@@ -68,8 +70,18 @@ $(function (){
 
 /* General functions */
 
+function restoreLastWorkspace(){
+	if(typeof window.localStorage.getItem(KANBAN_LAST_WORKSPACE) !== "undefined" &&
+		window.localStorage.getItem(KANBAN_LAST_WORKSPACE) != null &&
+		window.localStorage.getItem(KANBAN_LAST_WORKSPACE) in workspaces){		
+		currentWorkspace = window.localStorage.getItem(KANBAN_LAST_WORKSPACE);
+		alert(currentWorkspace);
+	}
+}
+
 function restoreWorkspaces(){
 	workspaces = JSON.parse(window.localStorage.getItem(KANBAN_WORKSPACES));
+	restoreLastWorkspace();
 }
 
 function saveWorkspaces(){
@@ -99,7 +111,7 @@ function initializeKanbanData(){
 		workspaces[KANBAN_DEFAULT_WORKSPACE_ID] = KANBAN_DEFAULT_WORKSPACE_NAME;
 		saveWorkspaces();
 	}else{
-		restoreWorkspaces();
+		restoreWorkspaces();		
 	}		
 
 	if(typeof window.localStorage.getItem(getWorkspaceName(currentWorkspace)) === "undefined" || 
@@ -363,7 +375,12 @@ function onSelectWorkspace(){
 
 function switchToWorkspace(workspaceId){
 	currentWorkspace = workspaceId;
+	updateLastWorkspace();	
 	initializeKanbanData();	
 	renderWorkspacesMenu();
 	redrawKanban();
+}
+
+function updateLastWorkspace(){
+	window.localStorage.setItem(KANBAN_LAST_WORKSPACE, currentWorkspace);
 }
