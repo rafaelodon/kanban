@@ -184,7 +184,7 @@ function redrawKanban(){
 	
 	var title = "Kanban - "+workspaces[currentWorkspace];	
 	document.title = title;
-	$("#title").html(title);
+	$("#title").html(workspaces[currentWorkspace]);
 
 	$(".task").remove();	
 
@@ -256,7 +256,7 @@ function generateWorkspaceId(){
 function onClickRenameWorkspace(){	
 	var newWorkspaceName = prompt(message("workspace_rename"));
 	if(newWorkspaceName){		
-		workspaces[workspaceId] = newWorkspaceName;
+		workspaces[currentWorkspace] = newWorkspaceName;
 		saveWorkspaces();		
 		redrawKanban();
 	}
