@@ -13,3 +13,16 @@ A simple kanban board for your daily tasks based on HTML5/JS with local storage.
 * A flexible shared kanban board to help a team.
 * Custom kanban board (columns, colors, etc.).
 * Detailed tasks data, statistics and analysis.
+
+## Installing instructions:
+
+Just clone the project contents and run the index.html file with your favourite browser.
+
+````
+git clone http://github.com/rafaelodon/kanban
+```
+
+Since the kanban board data is cached consideering the accessed URL, I strongly suggest you to clone it inside your Apache or Nginx public www folder (e.g. /var/www/kanban) and access it via URL (e.g. http://localhost/kanban).
+
+
+
