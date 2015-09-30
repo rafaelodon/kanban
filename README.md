@@ -14,7 +14,7 @@ A simple kanban board for your daily tasks based on HTML5/JS with local storage.
 * Custom kanban board (columns, colors, etc.).
 * Detailed tasks data, statistics and analysis.
 
-## Installing instructions:
+## Install instructions:
 
 Just clone the project contents and run the index.html file with your favourite browser.
 
