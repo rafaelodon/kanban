@@ -81,6 +81,18 @@
 					</div>
 				</div>
 			</div>		
+			<div id="modalPreview" class="modal">
+				<div style="padding: 24px; background: white">
+					<h2 id="taskPreviewTitle">Add Task</h2>										
+		        	<br/>
+		        	<p id="taskPreviewDescription"></p>		        	
+		        	<div style="text-align: right; margin-top: 12px">		        				        	
+			        	<button id="btnTaskPreviewOk" type="button" class="btn btn-default" aria-label="Ok">
+							<span class="glyphicon glyphicon-ok" aria-hidden="true"></span> Ok
+						</button>					
+					</div>
+				</div>
+			</div>
 			<div id="modalExport" class="modal">
 				<div style="padding: 24px; background: white">
 					<h2>Export Workspace Tasks</h2>										
@@ -96,8 +108,12 @@
 			</div>
 			<div id="modalImport" class="modal">
 				<div style="padding: 24px; background: white">
-					<h2>Import Tasks into Workspace</h2>										
-		        	<label>Tasks JSON:</label>
+					<h2>Import Tasks as New Workspace</h2>										
+					<label id="labelWorkspaceName">New Workspace Name:</label>
+					<input type="text" name="workspaceName" id="inputImportWorkspaceName" style="width: 100%"/>
+		        	<br/>
+		        	<br/>
+		        	<label id="labelImportJson">Tasks JSON:</label>
 		        	<textarea name="importJson" id="inputImportJson" style="width: 100%; height: 120px"></textarea>
 		        	<br/>
 		        	<div style="text-align: right; margin-top: 12px">		        	

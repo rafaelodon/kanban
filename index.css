@@ -161,8 +161,7 @@ h2,  h3{
 	float: right;
 }
 
-.task-edit,
-.task-remove{
+.task-action{
 	cursor: pointer;
 }
 
@@ -201,6 +200,17 @@ h2,  h3{
 	left: 50%;
 	margin-left: -25%;				
 	top: 25%;				
+}
+
+#modalPreview>div{
+	width:98%;
+	-webkit-box-shadow: 8px 8px 0px 0px rgba(0,0,0,0.2);
+	-moz-box-shadow: 8px 8px 0px 0px rgba(0,0,0,0.2);
+	box-shadow: 8px 8px 0px 0px rgba(0,0,0,0.2);
+}
+
+#taskPreviewDescription{
+
 }
 
 .required{

@@ -14,8 +14,8 @@ var tasks = {}
 var currentWorkspace = KANBAN_DEFAULT_WORKSPACE_ID;
 var currentTaskId = null;
 var lastTask = 1;
-var de = null;
-var para= null;
+var draggedFrom = null;
+var draggedTo = null;
 var draggedTask = null;
 var dragOptions = {
 	containment: 'window',
@@ -37,13 +37,17 @@ $(function (){
 	// Task actions
 	$(".tasksarea").on("click", ".task-remove", onClickRemoveTask);
 	$(".tasksarea").on("click", ".task-edit", onClickEditTask);
+	$(".tasksarea").on("click", ".task-zoom", onClickZoomTask);	
 	$(".tasksarea").on("mouseover", ".task", onMouseOverTask);
 	$(".tasksarea").on("mouseout", ".task", onMouseOutTask);	
 
-	// Add task bindings
+	// Add/Edit task bindings
 	$("#btnAddTask").click(onClickBtnAddTask);
 	$('#btnTaskCancel').click(hideModals);
 	$("#btnTaskOk").click(onClickBtnTaskOk);			
+
+	//Preview task binding
+	$("#btnTaskPreviewOk").click(hideModals);
 
 	// Export bindings
 	$("#export").click(onClickExport);
@@ -53,6 +57,8 @@ $(function (){
 	$("#import").click(onClickImport);	
 	$("#btnImportCancel").click(hideModals);
 	$("#btnImportOk").click(onClickBtnImportOk);
+	bindPressEnter("#inputTaskTitle",onClickBtnTaskOk)
+	bindPressEnter("#inputTaskDescription",onClickBtnTaskOk)
 
 	// Workspaces bindings
 	$('#linkNewWorkspace').click(onClickCreateNewWorkspace);
@@ -67,6 +73,16 @@ $(function (){
 	redrawKanban();	
 	
 });
+
+function bindPressEnter(selector,event){
+	$(selector).on("keypress",function(e){
+		var key = e.which;
+		if(key == 13) {
+			event();
+			return true;  
+		}
+	});
+}
 
 /* General functions */
 
@@ -153,8 +169,9 @@ function drawTask(id){
 	var $div = $("<div>", {id: id, class: "task"});	
 	$div.append("<h3>"+task.title+"</h3>");
 	$div.append("<p>"+task.description+"</p>");
+	$div.append("<span class='task-action task-remove glyphicon glyphicon-remove' aria-hidden='true'></span>&nbsp;");
 	$div.append("<span class='task-action task-edit glyphicon glyphicon-pencil' aria-hidden='true'></span>&nbsp;");
-	$div.append("<span class='task-action task-remove glyphicon glyphicon-remove' aria-hidden='true'></span>");
+	$div.append("<span class='task-action task-zoom glyphicon glyphicon-zoom-in' aria-hidden='true'></span>")
 	$div.draggable(dragOptions);	
 	$("div[kanban-column-id="+task.state+"]").append($div);
 	$("#"+id+" p, #"+id+" h3").dotdotdot(ellipsisOptions);	
@@ -202,13 +219,13 @@ function redrawKanban(){
 function getDragTaskHelper(){				
 	clone = $(this).clone();
 	clone.addClass('dragging');
-	clone.width($(this).outerWidth());
+	clone.outerWidth($(this).outerWidth());
 	return clone;
 }
 
 function onStartDragTask( event, ui ) {
 	draggedTask = event.currentTarget;
-	de = $(draggedTask.parentElement).attr("kanban-column-id");	
+	draggedFrom = $(draggedTask.parentElement).attr("kanban-column-id");	
 	$(draggedTask).addClass('dragged');
 }
 
@@ -217,10 +234,10 @@ function onStopDragTask(event, ui) {
 }
 
 function onDropTask(event, ui) {												
-	para = $(this).attr("kanban-column-id");	
-	if(de != para){
+	draggedTo = $(this).attr("kanban-column-id");	
+	if(draggedFrom != draggedTo){
 		var id = $(ui.draggable).attr("id");														
-		tasks[id].state = para;								
+		tasks[id].state = draggedTo;								
 		drawTask(id);				
 		saveTasks();			
 		ui.draggable.remove();				
@@ -259,6 +276,7 @@ function onClickRenameWorkspace(){
 		workspaces[currentWorkspace] = newWorkspaceName;
 		saveWorkspaces();		
 		redrawKanban();
+
 	}
 }
 
@@ -326,13 +344,27 @@ function onClickEditTask(e){
 	currentTaskId = id;
 }
 
+function onClickZoomTask(e){
+	var id = e.target.parentElement.id;	
+	$("#modalPreview h2").html(tasks[id].title);	
+	$("#modalPreview p").html(tasks[id].description);
+	$("#modalPreview>div").css("background-color", $(e.target.parentElement).css("background-color"));
+	showModal("modalPreview");	
+}
+
 function onClickExport(){		
 	$("#inputExportJson").val(JSON.stringify(tasks));		
 	showModal("modalExport")
 }
 
 function onClickImport(){				
+	
+	$("#inputImportWorkspaceName").val("");
+	$("#labelWorkspaceName").removeClass("required");
+
 	$("#inputImportJson").val("");
+	$("#labelImportJson").removeClass("required");
+
 	showModal("modalImport")
 }
 
@@ -345,17 +377,35 @@ function onMouseOutTask(){
 }
 
 function onClickBtnImportOk(){
-	try {			
+
+	$("#labelWorkspaceName").removeClass("required");
+	$("#labelImportJson").removeClass("required");
+
+	try {
+		var workspaceName = $("#inputImportWorkspaceName").val();	
+		if(workspaceName.trim() === ''){			
+	    	$("#labelWorkspaceName").addClass("required");
+	    	$("#inputImportWorkspaceName").focus();
+	    	return false;
+	    }
+
     	var tasksTemp = JSON.parse($("#inputImportJson").val());
     	if(confirm(message("confirm_import_tasks"))){
+
+			var workspaceId = generateWorkspaceId();
+			workspaces[workspaceId] = workspaceName;								
+			saveWorkspaces();			
 			tasks = tasksTemp;
+			currentWorkspace = workspaceId;
 			saveTasks();
-			redrawKanban();
-    		hideModals();        		
+			switchToWorkspace(workspaceId);						
+    		hideModals();        		    		
+
     		return true;
     	}
 	} catch (e) {
 		alert(message("error_invalid_json"));
+		$("#labelImportJson").addClass("required");
 		$("#inputImportJson").focus();
     	return false;
 	}    			
