@@ -210,7 +210,9 @@ h2,  h3{
 }
 
 #taskPreviewDescription{
-
+	max-height: 10em;
+	overflow-x: hidden;
+	overflow-y: auto;	
 }
 
 .required{
