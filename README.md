@@ -22,7 +22,7 @@ Just clone the project contents and run the index.html file with your favorite b
 git clone http://github.com/rafaelodon/kanban
 ```
 
-Since the kanban board data is cached considering the URL accessed, I strongly suggest you to clone it inside your Apache or Nginx public www folder (e.g. /var/www/kanban) and access from the server (e.g. http://localhost/kanban).
+Since the kanban board data is cached considering the URL accessed, I strongly suggest you to clone it inside your Apache or Nginx public www folder (e.g. /var/www/kanban) and then start accessing it throught the http server (e.g. http://localhost/kanban).
 
 
 
