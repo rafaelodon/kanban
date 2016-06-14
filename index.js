@@ -8,7 +8,7 @@
 var KANBAN_WORKSPACES = "kanban.workspaces";
 var KANBAN_LAST_WORKSPACE = "kanban.lastWorkspace";
 var KANBAN_DEFAULT_WORKSPACE_ID = "default";
-var KANBAN_DEFAULT_WORKSPACE_NAME = "Default Workspace";
+var KANBAN_DEFAULT_WORKSPACE_NAME = "Default Board";
 var workspaces = {}
 var tasks = {}
 var currentWorkspace = KANBAN_DEFAULT_WORKSPACE_ID;
@@ -38,6 +38,7 @@ $(function (){
 	$(".tasksarea").on("click", ".task-remove", onClickRemoveTask);
 	$(".tasksarea").on("click", ".task-edit", onClickEditTask);
 	$(".tasksarea").on("click", ".task-zoom", onClickZoomTask);	
+    $(".tasksarea").on("click", ".task-archive", onClickArchiveTask);
 	$(".tasksarea").on("mouseover", ".task", onMouseOverTask);
 	$(".tasksarea").on("mouseout", ".task", onMouseOutTask);	
 
@@ -64,6 +65,9 @@ $(function (){
 	$('#linkNewWorkspace').click(onClickCreateNewWorkspace);
 	$('#linkRenameWorkspace').click(onClickRenameWorkspace);
 	$('#linkRemoveWorkspace').click(onClickRemoveWorkspace);
+
+	$('#linkTasksHistory').click(onClickTasksHistory);
+	$('#btnHistoryOk').click(onClickHistoryOk);
 
 	// Others
 	$('.nav a').on('click', onClickNavbarLink);
@@ -166,33 +170,42 @@ function renderWorkspacesMenu(){
 
 function drawTask(id){
 	var task = tasks[id];
-	var $div = $("<div>", {id: id, class: "task"});	
-	$div.append("<h3>"+task.title+"</h3>");
-	$div.append("<p>"+task.description+"</p>");
-	$div.append("<span class='task-action task-remove glyphicon glyphicon-remove' aria-hidden='true'></span>&nbsp;");
-	$div.append("<span class='task-action task-edit glyphicon glyphicon-pencil' aria-hidden='true'></span>&nbsp;");
-	$div.append("<span class='task-action task-zoom glyphicon glyphicon-zoom-in' aria-hidden='true'></span>")
-	$div.draggable(dragOptions);	
-	$("div[kanban-column-id="+task.state+"]").append($div);
-	$("#"+id+" p, #"+id+" h3").dotdotdot(ellipsisOptions);	
+    if(task.visible != false){
+    	var $div = $("<div>", {id: id, class: "task"});	
+    	$div.append("<h3>"+task.title+"</h3>");
+	    $div.append("<p>"+task.description+"</p>");
+	    $div.append("<span class='task-action task-remove glyphicon glyphicon-remove' aria-hidden='true' title='Remove'></span>&nbsp;");
+    	$div.append("<span class='task-action task-edit glyphicon glyphicon-pencil' aria-hidden='true' title='Edit'></span>&nbsp;");
+    	$div.append("<span class='task-action task-zoom glyphicon glyphicon-zoom-in' aria-hidden='true' title='Zoom'></span>&nbsp;");
+        if(task.state == "done"){
+           	$div.append("<span class='task-action task-archive glyphicon glyphicon-save' aria-hidden='true' title='Archive'></span>");
+        }
+    	$div.draggable(dragOptions);	
+    	$("div[kanban-column-id="+task.state+"]").append($div);
+    	$("#"+id+" p, #"+id+" h3").dotdotdot(ellipsisOptions);	
+    }
 }
 
 function redrawTask(id){
 	var task = tasks[id];
-	$div = $("#"+id);
-	$div.find("h3").html(task.title);
-	$div.find("p").html(task.description);
+    $div = $("#"+id);
+    if(task.visible != false){
+        $div.find("h3").html(task.title);
+        $div.find("p").html(task.description);
+    }else{
+        $div.hide();
+    }
 }
 
 function showModal(m){
 	$("#modalContainer").find(".modal").hide();
-	$("#modalContainer").show(); 		
-	$("#"+m).show();
+	$("#modalContainer").fadeIn(); 		
+	$("#"+m).fadeIn();
 }
 
 function hideModals(){
-	$("#modalContainer").find(".modal").hide();
-	$("#modalContainer").hide();
+	$("#modalContainer").find(".modal").fadeOut();
+	$("#modalContainer").fadeOut();
 }
 
 function redrawKanban(){
@@ -237,7 +250,11 @@ function onDropTask(event, ui) {
 	draggedTo = $(this).attr("kanban-column-id");	
 	if(draggedFrom != draggedTo){
 		var id = $(ui.draggable).attr("id");														
-		tasks[id].state = draggedTo;								
+		tasks[id].state = draggedTo;
+		if(!tasks[id].history){
+			tasks[id].history = [];
+		};
+		tasks[id].history.push({"date": new Date(), "state":draggedTo})
 		drawTask(id);				
 		saveTasks();			
 		ui.draggable.remove();				
@@ -295,6 +312,61 @@ function removeWorkspace(workspaceId){
 	saveWorkspaces();	
 }
 
+function onClickTasksHistory(){
+	tb = $("#historyTable tbody");
+	tb.empty();
+	
+	var tasksArray = [];
+	for(var t in tasks){
+		tasksArray.push(tasks[t]);
+	}
+
+	tasksArray.sort(function(a,b){
+		if(b.state != a.state){
+			return b.state > a.state;
+		}
+	});
+	
+	for(var t in tasksArray){		
+		var task = tasksArray[t];
+		var dateText = "";
+		if(task.history){						
+			dateText = dataFormatada(new Date(task.history[task.history.length-1].date));
+		}
+		var cssClass = "";
+		if(task.state === "todo"){
+			cssClass += "red";
+		}else if(task.state === "wip"){
+			cssClass += "yellow";
+		}else if(task.state === "done"){
+			cssClass += "green";
+		}		
+
+		tb.append("<tr class="+cssClass+"><td>"+task.title+"</td><td>"+task.state+"</td><td>"+dateText+"</td></tr>");
+	}
+	
+	showModal("modalHistory");
+	$("#historyTableContainer").height($("#modalHistory").outerHeight() * 0.75);
+}
+
+function dataFormatada(data){    		
+    var dia = data.getDate();
+
+    if (dia.toString().length == 1){
+    	dia = "0"+dia;
+	}
+    var mes = data.getMonth()+1;
+    if (mes.toString().length == 1){
+    	mes = "0"+mes;
+	}
+    var ano = data.getFullYear();  
+    var s = ano+"-"+mes+"-"+dia;    
+    return s;
+}
+
+function onClickHistoryOk(){
+	hideModals();
+}
 
 function onClickBtnTaskOk() {
 	var title = $("#inputTaskTitle").val();
@@ -307,11 +379,12 @@ function onClickBtnTaskOk() {
 	
 	if(title.trim() != ''){
 		if(currentTaskId == null){
-			tasks[id] = {"title":title, "description":description, "state":"todo"};											
+			tasks[id] = {"title":title, "description":description, "state":"todo" };														
+			tasks[id].history = [{"date": new Date(), "state":"todo"}];
 			drawTask(id);
 		}else{
 			tasks[id].title = title;
-			tasks[id].description = description;
+			tasks[id].description = description;			
 			redrawTask(id);
 		}
 		saveTasks();
@@ -366,6 +439,15 @@ function onClickImport(){
 	$("#labelImportJson").removeClass("required");
 
 	showModal("modalImport")
+}
+
+function onClickArchiveTask(e){
+    var id = e.target.parentElement.id;
+	if(confirm(message("confirm_archive_task",tasks[id].title))){
+       tasks[id].visible = false;
+       redrawTask(id);
+       saveTasks();
+    }
 }
 
 function onMouseOverTask(){

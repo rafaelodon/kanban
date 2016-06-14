@@ -137,6 +137,31 @@ h2,  h3{
 	line-height: 1em;
 }
 
+#historyTable td, tr{
+	line-height: 1em;	
+}
+
+#historyTable td{
+	border-top: 2px solid #FFF;
+}
+
+#historyTable{
+	width: 100%;
+}
+
+
+#historyTable .red{
+	background-color: #ffcccc;
+}
+
+#historyTable .yellow{
+	background-color: #ffffcc;
+}
+
+#historyTable .green{
+	background-color: #ccffcc;
+}
+
 .red .task{
 	background-color: #FF9999;
 }
@@ -200,6 +225,13 @@ h2,  h3{
 	left: 50%;
 	margin-left: -25%;				
 	top: 25%;				
+}
+
+#modalHistory{
+	width: 80%;
+	margin-left: -40%;
+	height: 80%;		
+	top: 10%;
 }
 
 #modalPreview>div{

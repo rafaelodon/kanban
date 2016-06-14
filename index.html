@@ -11,18 +11,21 @@
   		<nav id="navbar">	  			
     		<div id="menu" class="dropdown">
 				<a class="dropdown-toggle" data-toggle="dropdown" href="#">
-					<span class="glyphicon glyphicon-folder-open"></span>&nbsp;&nbsp;Workspace
+					<span class="glyphicon glyphicon-folder-open"></span>&nbsp;&nbsp;Boards
 				</a>							
 				<ul id="ulWorkspaces" class="dropdown-menu">
 					<li>
 						<a href="#" id="linkNewWorkspace">
-							<span class="glyphicon glyphicon-plus"></span> New workspace...
+							<span class="glyphicon glyphicon-plus"></span> New board...
 						</a>
 						<a href="#" id="linkRenameWorkspace">
-							<span class="glyphicon glyphicon-pencil"></span> Rename this workspace
+							<span class="glyphicon glyphicon-pencil"></span> Rename this board
 						</a>
 						<a href="#" id="linkRemoveWorkspace">
-							<span class="glyphicon glyphicon-remove"></span> Remove this workspace
+							<span class="glyphicon glyphicon-remove"></span> Remove this board
+						</a>
+						<a href="#" id="linkTasksHistory">
+							<span class="glyphicon glyphicon-book"></span> Tasks History
 						</a>
 						<a id="export" href="#export">
 		            		<span class="glyphicon glyphicon-export"></span> Export
@@ -35,7 +38,7 @@
 				</ul>
 			</div>
 			<div id="title"></div>  		            		        
-	        <div id="icon"><img src="kanban.png" /> Kanban</div>	        		        			       
+	        <div id="icon"><img src="kanban.png" /> Personal Kanban</div>	        		        			       
 	    </nav>
   		<div id="kanban">  			  					  	
   			<div class="column">
@@ -95,7 +98,7 @@
 			</div>
 			<div id="modalExport" class="modal">
 				<div style="padding: 24px; background: white">
-					<h2>Export Workspace Tasks</h2>										
+					<h2>Export Board Tasks</h2>										
 		        	<label>Tasks JSON:</label>
 		        	<textarea name="exportJson" id="inputExportJson" style="width: 100%; height: 120px" readonly="true"></textarea>
 		        	<br/>
@@ -108,7 +111,7 @@
 			</div>
 			<div id="modalImport" class="modal">
 				<div style="padding: 24px; background: white">
-					<h2>Import Tasks as New Workspace</h2>										
+					<h2>Import Tasks as New Board</h2>										
 					<label id="labelWorkspaceName">New Workspace Name:</label>
 					<input type="text" name="workspaceName" id="inputImportWorkspaceName" style="width: 100%"/>
 		        	<br/>
@@ -126,6 +129,29 @@
 					</div>
 				</div>
 			</div>	
+			<div id="modalHistory" class="modal">
+				<div style="padding: 24px; background: white;">
+					<h2>Tasks History</h2>				
+					<div id="historyTableContainer" style="display: block; overflow-y: scroll; width: 100%;">
+						<table id="historyTable">
+							<thead>
+								<tr>
+									<th style="width: 70%">Title</th>
+									<th style="width: 10%">State</th>
+									<th style="width: 10%">Date</th>
+								</tr>
+							</thead>
+							<tbody>
+							</tbody>
+						</table>
+					</div>
+		        	<div style="text-align: right; margin-top: 12px">		        				        	
+			        	<button id="btnHistoryOk" type="button" class="btn btn-default" aria-label="Ok">
+							<span class="glyphicon glyphicon-ok" aria-hidden="true"></span> Ok
+						</button>
+					</div>
+				</div>
+			</div>
 		</div>		
 		
 		<script type="text/javascript" src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
