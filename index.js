@@ -3,6 +3,7 @@
  * 
  * Author: Rafael Odon (odon.rafael@gmail.com)
  * Git: https://github.com/rafaelodon/kanban
+ *
  */
 
 var KANBAN_WORKSPACES = "kanban.workspaces";
@@ -322,10 +323,14 @@ function onClickTasksHistory(){
 	}
 
 	tasksArray.sort(function(a,b){
-		if(b.state != a.state){
-			return b.state > a.state;
-		}
-	});
+        if(a.history && b.history){
+            return a.history[a.history.length-1].date < b.history[b.history.length-1].date;
+        }else if(a.history){
+            return false;
+        }else{
+            return true;
+        }
+    });
 	
 	for(var t in tasksArray){		
 		var task = tasksArray[t];
@@ -351,17 +356,16 @@ function onClickTasksHistory(){
 
 function dataFormatada(data){    		
     var dia = data.getDate();
-
-    if (dia.toString().length == 1){
-    	dia = "0"+dia;
-	}
     var mes = data.getMonth()+1;
-    if (mes.toString().length == 1){
-    	mes = "0"+mes;
-	}
     var ano = data.getFullYear();  
-    var s = ano+"-"+mes+"-"+dia;    
-    return s;
+	var horas = data.getHours();
+	var minutos = data.getMinutes();
+    dia = dia < 10 ? "0"+dia : dia;
+    mes = mes < 10 ? "0"+mes : mes;
+	horas = horas < 10 ? '0'+horas : horas;
+	minutos = minutos < 10 ? '0'+minutos : minutos;
+
+	return dia+"/"+mes+"/"+ano+" "+horas+":"+ minutos;    
 }
 
 function onClickHistoryOk(){
