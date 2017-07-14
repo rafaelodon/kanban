@@ -6,40 +6,43 @@
  *
  */
 
-var KANBAN_WORKSPACES = "kanban.workspaces";
-var KANBAN_LAST_WORKSPACE = "kanban.lastWorkspace";
-var KANBAN_DEFAULT_WORKSPACE_ID = "default";
-var KANBAN_DEFAULT_WORKSPACE_NAME = "Default Board";
-var workspaces = {}
-var tasks = {}
-var currentWorkspace = KANBAN_DEFAULT_WORKSPACE_ID;
-var currentTaskId = null;
-var lastTask = 1;
-var draggedFrom = null;
-var draggedTo = null;
-var draggedTask = null;
-var dragOptions = {
+// Constants
+var KANBAN_BOARDS = "kanban.workspaces";
+var KANBAN_LAST_BOARD = "kanban.lastWorkspace";
+var KANBAN_DEFAULT_BOARD_ID = "default";
+var KANBAN_DEFAULT_BOARD_NAME = "Default Board";
+var DRAG_OPTIONS = {
 	containment: 'window',
 	helper: getDragTaskHelper,
 	start: onStartDragTask,
 	stop: onStopDragTask	
 };
-var ellipsisOptions = {
+var ELLIPSIS_OPTIONS = {
 	ellipsis : "...",
 	watch: "window"
 };
 
+// Aplication Model
+var workspaces = {}
+var tasks = {}
+var currentWorkspace = KANBAN_DEFAULT_BOARD_ID;
+var currentTaskId = null;
+var lastTask = 1;
+var draggedFrom = null;
+var draggedTo = null;
+var draggedTask = null;
+
 $(function (){
 	
 	// Drag & Drop
-	$('.task').draggable(dragOptions);	
+	$('.task').draggable(DRAG_OPTIONS);	
 	$('.tasksarea').droppable({ drop: onDropTask });	
 
 	// Task actions
 	$(".tasksarea").on("click", ".task-remove", onClickRemoveTask);
 	$(".tasksarea").on("click", ".task-edit", onClickEditTask);
 	$(".tasksarea").on("click", ".task-zoom", onClickZoomTask);	
-    $(".tasksarea").on("click", ".task-archive", onClickArchiveTask);
+    $(".tasksarea").on("click", ".tasrk-archive", onClickArchiveTask);
 	$(".tasksarea").on("mouseover", ".task", onMouseOverTask);
 	$(".tasksarea").on("mouseout", ".task", onMouseOutTask);	
 
@@ -92,24 +95,24 @@ function bindPressEnter(selector,event){
 /* General functions */
 
 function restoreLastWorkspace(){
-	if(typeof window.localStorage.getItem(KANBAN_LAST_WORKSPACE) !== "undefined" &&
-		window.localStorage.getItem(KANBAN_LAST_WORKSPACE) != null &&
-		window.localStorage.getItem(KANBAN_LAST_WORKSPACE) in workspaces){		
-		currentWorkspace = window.localStorage.getItem(KANBAN_LAST_WORKSPACE);
+	if(typeof window.localStorage.getItem(KANBAN_LAST_BOARD) !== "undefined" &&
+		window.localStorage.getItem(KANBAN_LAST_BOARD) != null &&
+		window.localStorage.getItem(KANBAN_LAST_BOARD) in workspaces){		
+		currentWorkspace = window.localStorage.getItem(KANBAN_LAST_BOARD);
 	}
 }
 
 function restoreWorkspaces(){
-	workspaces = JSON.parse(window.localStorage.getItem(KANBAN_WORKSPACES));
+	workspaces = JSON.parse(window.localStorage.getItem(KANBAN_BOARDS));
 	restoreLastWorkspace();
 }
 
 function saveWorkspaces(){
-	window.localStorage.setItem(KANBAN_WORKSPACES, JSON.stringify(workspaces));
+	window.localStorage.setItem(KANBAN_BOARDS, JSON.stringify(workspaces));
 }
 
 function getWorkspaceName(workspaceId){
-	return KANBAN_WORKSPACES+"."+workspaceId;
+	return KANBAN_BOARDS+"."+workspaceId;
 }
 
 function restoreTasks(){
@@ -124,11 +127,11 @@ function saveTasks(){
 }
 
 function initializeKanbanData(){
-	if(typeof window.localStorage.getItem(KANBAN_WORKSPACES) === "undefined" ||
-		window.localStorage.getItem(KANBAN_WORKSPACES) == null || 
-		window.localStorage.getItem(KANBAN_WORKSPACES) == "{}"){
+	if(typeof window.localStorage.getItem(KANBAN_BOARDS) === "undefined" ||
+		window.localStorage.getItem(KANBAN_BOARDS) == null || 
+		window.localStorage.getItem(KANBAN_BOARDS) == "{}"){
 		workspaces = {};
-		workspaces[KANBAN_DEFAULT_WORKSPACE_ID] = KANBAN_DEFAULT_WORKSPACE_NAME;
+		workspaces[KANBAN_DEFAULT_BOARD_ID] = KANBAN_DEFAULT_BOARD_NAME;
 		saveWorkspaces();
 	}else{
 		restoreWorkspaces();		
@@ -144,9 +147,9 @@ function initializeKanbanData(){
 }
 
 function renderWorkspacesMenu(){
-	workspaces = JSON.parse(window.localStorage.getItem(KANBAN_WORKSPACES));	
+	workspaces = JSON.parse(window.localStorage.getItem(KANBAN_BOARDS));	
 
-	if(currentWorkspace == KANBAN_DEFAULT_WORKSPACE_ID){
+	if(currentWorkspace == KANBAN_DEFAULT_BOARD_ID){
 		$("#linkRemoveWorkspace").hide();
 		$("#linkRenameWorkspace").hide();
 	}else{
@@ -181,14 +184,14 @@ function drawTask(id){
         if(task.state == "done"){
            	$div.append("<span class='task-action task-archive glyphicon glyphicon-save' aria-hidden='true' title='Archive'></span>");
         }
-    	$div.draggable(dragOptions);	
+    	$div.draggable(DRAG_OPTIONS);	
     	$("div[kanban-column-id="+task.state+"]").append($div);
-    	$("#"+id+" p, #"+id+" h3").dotdotdot(ellipsisOptions);	
+    	$("#"+id+" p, #"+id+" h3").dotdotdot(ELLIPSIS_OPTIONS);	
     }
 }
 
 function redrawTask(id){
-	var task = tasks[id];
+	var task = tasks[id];r
     $div = $("#"+id);
     if(task.visible != false){
         $div.find("h3").html(task.title);
@@ -303,7 +306,7 @@ function onClickRemoveWorkspace(){
 		//remove old workspace
 		removeWorkspace(currentWorkspace);
 		renderWorkspacesMenu();
-		switchToWorkspace(KANBAN_DEFAULT_WORKSPACE_ID);
+		switchToWorkspace(KANBAN_DEFAULT_BOARD_ID);
 	}
 }
 
@@ -517,5 +520,5 @@ function switchToWorkspace(workspaceId){
 }
 
 function updateLastWorkspace(){
-	window.localStorage.setItem(KANBAN_LAST_WORKSPACE, currentWorkspace);
+	window.localStorage.setItem(KANBAN_LAST_BOARD, currentWorkspace);
 }
