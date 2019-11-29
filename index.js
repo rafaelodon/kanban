@@ -191,7 +191,7 @@ function drawTask(id){
 }
 
 function redrawTask(id){
-	var task = tasks[id];r
+    var task = tasks[id];
     $div = $("#"+id);
     if(task.visible != false){
         $div.find("h3").html(task.title);
