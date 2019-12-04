@@ -7,10 +7,6 @@
  */
 
 // Constants
-var KANBAN_BOARDS = "kanban.workspaces";
-var KANBAN_LAST_BOARD = "kanban.lastWorkspace";
-var KANBAN_DEFAULT_BOARD_ID = "default";
-var KANBAN_DEFAULT_BOARD_NAME = "Default Board";
 var DRAG_OPTIONS = {
 	containment: 'window',
 	helper: getDragTaskHelper,
@@ -22,12 +18,14 @@ var ELLIPSIS_OPTIONS = {
 	watch: "window"
 };
 
+// Dependencies
+var storage = new KanbanStorage();
+
 // Aplication Model
-var workspaces = {}
-var tasks = {}
-var currentWorkspace = KANBAN_DEFAULT_BOARD_ID;
+var boards = []
+var currentBoard = null;
 var currentTaskId = null;
-var lastTask = 1;
+var lastTaskId = 1;
 var draggedFrom = null;
 var draggedTo = null;
 var draggedTask = null;
@@ -42,7 +40,7 @@ $(function (){
 	$(".tasksarea").on("click", ".task-remove", onClickRemoveTask);
 	$(".tasksarea").on("click", ".task-edit", onClickEditTask);
 	$(".tasksarea").on("click", ".task-zoom", onClickZoomTask);	
-    $(".tasksarea").on("click", ".tasrk-archive", onClickArchiveTask);
+	$(".tasksarea").on("click", ".task-archive", onClickArchiveTask);
 	$(".tasksarea").on("mouseover", ".task", onMouseOverTask);
 	$(".tasksarea").on("mouseout", ".task", onMouseOutTask);	
 
@@ -65,10 +63,10 @@ $(function (){
 	bindPressEnter("#inputTaskTitle",onClickBtnTaskOk)
 	bindPressEnter("#inputTaskDescription",onClickBtnTaskOk)
 
-	// Workspaces bindings
+	// boards bindings
 	$('#linkNewWorkspace').click(onClickCreateNewWorkspace);
 	$('#linkRenameWorkspace').click(onClickRenameWorkspace);
-	$('#linkRemoveWorkspace').click(onClickRemoveWorkspace);
+	$('#linkRemoveWorkspace').click(onClickRemoveBoard);
 
 	$('#linkTasksHistory').click(onClickTasksHistory);
 	$('#btnHistoryOk').click(onClickHistoryOk);
@@ -76,10 +74,11 @@ $(function (){
 	// Others
 	$('.nav a').on('click', onClickNavbarLink);
 
-	initializeKanbanData();
-	renderWorkspacesMenu();
-	redrawKanban();	
+	boards = storage.listExistingBoards();
+	currentBoard = storage.loadLastBoard();
 	
+	renderboardsMenu();
+	redrawKanban();		
 });
 
 function bindPressEnter(selector,event){
@@ -93,63 +92,8 @@ function bindPressEnter(selector,event){
 }
 
 /* General functions */
-
-function restoreLastWorkspace(){
-	if(typeof window.localStorage.getItem(KANBAN_LAST_BOARD) !== "undefined" &&
-		window.localStorage.getItem(KANBAN_LAST_BOARD) != null &&
-		window.localStorage.getItem(KANBAN_LAST_BOARD) in workspaces){		
-		currentWorkspace = window.localStorage.getItem(KANBAN_LAST_BOARD);
-	}
-}
-
-function restoreWorkspaces(){
-	workspaces = JSON.parse(window.localStorage.getItem(KANBAN_BOARDS));
-	restoreLastWorkspace();
-}
-
-function saveWorkspaces(){
-	window.localStorage.setItem(KANBAN_BOARDS, JSON.stringify(workspaces));
-}
-
-function getWorkspaceName(workspaceId){
-	return KANBAN_BOARDS+"."+workspaceId;
-}
-
-function restoreTasks(){
-	tasks = JSON.parse(window.localStorage.getItem(getWorkspaceName(currentWorkspace)));
-	if(tasks == null || tasks === "undefined"){
-		tasks = {};
-	}
-}
-
-function saveTasks(){
-	window.localStorage.setItem(getWorkspaceName(currentWorkspace), JSON.stringify(tasks));
-}
-
-function initializeKanbanData(){
-	if(typeof window.localStorage.getItem(KANBAN_BOARDS) === "undefined" ||
-		window.localStorage.getItem(KANBAN_BOARDS) == null || 
-		window.localStorage.getItem(KANBAN_BOARDS) == "{}"){
-		workspaces = {};
-		workspaces[KANBAN_DEFAULT_BOARD_ID] = KANBAN_DEFAULT_BOARD_NAME;
-		saveWorkspaces();
-	}else{
-		restoreWorkspaces();		
-	}		
-
-	if(typeof window.localStorage.getItem(getWorkspaceName(currentWorkspace)) === "undefined" || 
-		window.localStorage.getItem(getWorkspaceName(currentWorkspace)) == null){	
-		tasks = {};
-		saveTasks();	
-	}else{
-		restoreTasks();	
-	}
-}
-
-function renderWorkspacesMenu(){
-	workspaces = JSON.parse(window.localStorage.getItem(KANBAN_BOARDS));	
-
-	if(currentWorkspace == KANBAN_DEFAULT_BOARD_ID){
+function renderboardsMenu(){
+	if(currentBoard.id == storage.DEFAULT_BOARD_ID){
 		$("#linkRemoveWorkspace").hide();
 		$("#linkRenameWorkspace").hide();
 	}else{
@@ -158,22 +102,20 @@ function renderWorkspacesMenu(){
 	}
 
 	$(".liWorkspace").remove();
-	for(var w in workspaces){		
-
-		var $a = $("<a>", {href: "#", id: w});
-		$a.html(workspaces[w]);
-
+	boards.forEach(function(board) {
+		var $a = $("<a>", {href: "#", id: board.id});
+		$a.html(board.name);
 		$a.click(onSelectWorkspace);
 
 		var $li = $("<li>", {class: "liWorkspace"});
 		$li.append($a);
-
+		
 		$("#ulWorkspaces").append($li);
-	}
+	});
 }
 
 function drawTask(id){
-	var task = tasks[id];
+	var task = currentBoard.tasks[id];
     if(task.visible != false){
     	var $div = $("<div>", {id: id, class: "task"});	
     	$div.append("<h3>"+task.title+"</h3>");
@@ -191,7 +133,7 @@ function drawTask(id){
 }
 
 function redrawTask(id){
-    var task = tasks[id];
+	var task = currentBoard.tasks[id];
     $div = $("#"+id);
     if(task.visible != false){
         $div.find("h3").html(task.title);
@@ -203,29 +145,29 @@ function redrawTask(id){
 
 function showModal(m){
 	$("#modalContainer").find(".modal").hide();
-	$("#modalContainer").fadeIn(); 		
-	$("#"+m).fadeIn();
+	$("#modalContainer").show(); 		
+	$("#"+m).show();
 }
 
 function hideModals(){
-	$("#modalContainer").find(".modal").fadeOut();
-	$("#modalContainer").fadeOut();
+	$("#modalContainer").find(".modal").hide();
+	$("#modalContainer").hide();
 }
 
 function redrawKanban(){
 	
-	lastTask = 0;	
+	lastTaskId = 0;	
 	
-	var title = "Kanban - "+workspaces[currentWorkspace];	
+	var title = "Kanban - "+currentBoard.name;	
 	document.title = title;
-	$("#title").html(workspaces[currentWorkspace]);
+	$("#title").html(currentBoard.name);
 
 	$(".task").remove();	
 
-	for(var t in tasks){
+	for(var t in currentBoard.tasks){
 		var idNum = parseInt(t.replace(/t/g,''));
-		if(idNum > lastTask){
-			lastTask = idNum;			
+		if(idNum > lastTaskId){
+			lastTaskId = idNum;			
 		}		
 		drawTask(t);
 	};
@@ -254,13 +196,13 @@ function onDropTask(event, ui) {
 	draggedTo = $(this).attr("kanban-column-id");	
 	if(draggedFrom != draggedTo){
 		var id = $(ui.draggable).attr("id");														
-		tasks[id].state = draggedTo;
-		if(!tasks[id].history){
-			tasks[id].history = [];
+		currentBoard.tasks[id].state = draggedTo;
+		if(!currentBoard.tasks[id].history){
+			currentBoard.tasks[id].history = [];
 		};
-		tasks[id].history.push({"date": new Date(), "state":draggedTo})
-		drawTask(id);				
-		saveTasks();			
+		currentBoard.tasks[id].history.push({"date": new Date(), "state":draggedTo})
+		drawTask(id);
+		storage.saveBoard(currentBoard);
 		ui.draggable.remove();				
 	}
 }
@@ -277,43 +219,48 @@ function onClickBtnAddTask(){
 }
 
 function onClickCreateNewWorkspace(){	
-	var workspaceName = prompt(message("workspace_new"));
-	if(workspaceName){
-		var workspaceId = generateWorkspaceId();
-		workspaces[workspaceId] = workspaceName;		
-		saveWorkspaces();
-		renderWorkspacesMenu();		
-		switchToWorkspace(workspaceId);
+	var boardName = prompt(message("workspace_new"));
+	if(boardName){
+		var boardId = generateBoardId();
+
+		var newBoard = { id: boardId, name: boardName, tasks: {}};
+		boards.push(newBoard);		
+		storage.saveBoard(newBoard);
+		storage.saveExistingBoardsList(boards);		
+		
+		renderboardsMenu();		
+		switchToBoard(boardId);
 	}
 }
 
-function generateWorkspaceId(){
-	return new Date().getTime();
+function generateBoardId(){
+	return "kanban.boards."+new Date().getTime();
 }
 
 function onClickRenameWorkspace(){	
 	var newWorkspaceName = prompt(message("workspace_rename"));
 	if(newWorkspaceName){		
-		workspaces[currentWorkspace] = newWorkspaceName;
-		saveWorkspaces();		
+		boards[currentBoard] = newWorkspaceName;
+		saveboards();		
 		redrawKanban();
 
 	}
 }
 
-function onClickRemoveWorkspace(){
-	if(confirm(message("confirm_workspace_remove",workspaces[currentWorkspace]))){
-		//remove old workspace
-		removeWorkspace(currentWorkspace);
-		renderWorkspacesMenu();
-		switchToWorkspace(KANBAN_DEFAULT_BOARD_ID);
+function onClickRemoveBoard(){
+	if(confirm(message("confirm_workspace_remove",boards[currentBoard]))){		
+		removeCurrentBoard();
+		renderboardsMenu();
+		switchToBoard(storage.DEFAULT_BOARD_ID);
 	}
 }
 
-function removeWorkspace(workspaceId){	
-	window.localStorage.setItem(getWorkspaceName(workspaceId),"undefined");
-	delete workspaces[workspaceId];
-	saveWorkspaces();	
+function removeCurrentBoard(){	
+	storage.removeBoardById(currentBoard.id);
+	boards = boards.filter( function(b) {
+		return b.id != currentBoard.id;
+	});	
+	storage.saveExistingBoardsList(boards);	
 }
 
 function onClickTasksHistory(){
@@ -321,17 +268,17 @@ function onClickTasksHistory(){
 	tb.empty();
 	
 	var tasksArray = [];
-	for(var t in tasks){
-		tasksArray.push(tasks[t]);
+	for(var t in currentBoard.tasks){
+		tasksArray.push(currentBoard.tasks[t]);
 	}
 
 	tasksArray.sort(function(a,b){
-        if(a.history && b.history){
+        if(a.history != 'undefined' && b.history != 'undefined'){
             return a.history[a.history.length-1].date < b.history[b.history.length-1].date;
         }else if(a.history){
-            return false;
-        }else{
             return true;
+        }else{
+            return false;
         }
     });
 	
@@ -380,21 +327,21 @@ function onClickBtnTaskOk() {
 	var description = $("#inputTaskDescription").val();
 	var id = currentTaskId;
 	if(id == null){				
-		lastTask++;
-		id = "t"+(lastTask);
+		lastTaskId++;
+		id = "t"+(lastTaskId);
 	}	
 	
 	if(title.trim() != ''){
 		if(currentTaskId == null){
-			tasks[id] = {"title":title, "description":description, "state":"todo" };														
-			tasks[id].history = [{"date": new Date(), "state":"todo"}];
+			currentBoard.tasks[id] = {"title":title, "description":description, "state":"todo" };
+			currentBoard.tasks[id].history = [{"date": new Date(), "state":"todo"}];
 			drawTask(id);
 		}else{
-			tasks[id].title = title;
-			tasks[id].description = description;			
+			currentBoard.tasks[id].title = title;
+			currentBoard.tasks[id].description = description;			
 			redrawTask(id);
-		}
-		saveTasks();
+		}		
+		storage.saveBoard(currentBoard);		
 		hideModals();
 		$("#labelTaskTitle").removeClass("required");
     	return true;
@@ -407,9 +354,9 @@ function onClickBtnTaskOk() {
 
 function onClickRemoveTask(e){ 
 	id = e.target.parentElement.id;
-	if(confirm(message("confirm_remove_task",tasks[id].title))){			
-		delete tasks[id];
-		saveTasks();
+	if(confirm(message("confirm_remove_task",currentBoard.tasks[id].title))){			
+		delete currentBoard.tasks[id];
+		storage.saveBoard(currentBoard);
 		$("#"+id).remove();
 	}
 }
@@ -417,8 +364,8 @@ function onClickRemoveTask(e){
 function onClickEditTask(e){ 
 	var id = e.target.parentElement.id;
 	$("#modalTask h2").html("Edit Task");
-	$("#inputTaskTitle").val(tasks[id].title);
-	$("#inputTaskDescription").val(tasks[id].description);
+	$("#inputTaskTitle").val(currentBoard.tasks[id].title);
+	$("#inputTaskDescription").val(currentBoard.tasks[id].description);
 	showModal("modalTask"); 
 	$("#inputTaskTitle").focus();
 	currentTaskId = id;
@@ -426,14 +373,14 @@ function onClickEditTask(e){
 
 function onClickZoomTask(e){
 	var id = e.target.parentElement.id;	
-	$("#modalPreview h2").html(tasks[id].title);	
-	$("#modalPreview p").html(tasks[id].description);
+	$("#modalPreview h2").html(currentBoard.tasks[id].title);	
+	$("#modalPreview p").html(currentBoard.tasks[id].description);
 	$("#modalPreview>div").css("background-color", $(e.target.parentElement).css("background-color"));
 	showModal("modalPreview");	
 }
 
 function onClickExport(){		
-	$("#inputExportJson").val(JSON.stringify(tasks));		
+	$("#inputExportJson").val(JSON.stringify(currentBoard));		
 	showModal("modalExport")
 }
 
@@ -450,10 +397,10 @@ function onClickImport(){
 
 function onClickArchiveTask(e){
     var id = e.target.parentElement.id;
-	if(confirm(message("confirm_archive_task",tasks[id].title))){
-       tasks[id].visible = false;
+	if(confirm(message("confirm_archive_task",currentBoard.tasks[id].title))){
+       currentBoard.tasks[id].visible = false;
        redrawTask(id);
-       saveTasks();
+       storage.saveBoard(currentBoard);
     }
 }
 
@@ -471,8 +418,8 @@ function onClickBtnImportOk(){
 	$("#labelImportJson").removeClass("required");
 
 	try {
-		var workspaceName = $("#inputImportWorkspaceName").val();	
-		if(workspaceName.trim() === ''){			
+		var boardName = $("#inputImportWorkspaceName").val();	
+		if(boardName.trim() === ''){			
 	    	$("#labelWorkspaceName").addClass("required");
 	    	$("#inputImportWorkspaceName").focus();
 	    	return false;
@@ -481,13 +428,12 @@ function onClickBtnImportOk(){
     	var tasksTemp = JSON.parse($("#inputImportJson").val());
     	if(confirm(message("confirm_import_tasks"))){
 
-			var workspaceId = generateWorkspaceId();
-			workspaces[workspaceId] = workspaceName;								
-			saveWorkspaces();			
-			tasks = tasksTemp;
-			currentWorkspace = workspaceId;
-			saveTasks();
-			switchToWorkspace(workspaceId);						
+			var boardId = generateBoardId();
+			boards[boardId] = boardName;								
+			saveboards();						
+			currentBoard = { id : boardId, name: workspaceName, tasks : tasksTemp };
+			storage.saveBoard(currentBoard);
+			switchToBoard(currentBoard);
     		hideModals();        		    		
 
     		return true;
@@ -508,17 +454,11 @@ function onClickNavbarLink(){
 }
 
 function onSelectWorkspace(){			
-	switchToWorkspace($(this).attr("id"));	
+	switchToBoard($(this).attr("id"));	
 }
 
-function switchToWorkspace(workspaceId){
-	currentWorkspace = workspaceId;
-	updateLastWorkspace();	
-	initializeKanbanData();	
-	renderWorkspacesMenu();
+function switchToBoard(boardId){
+	currentBoard = storage.loadBoardById(boardId);		
+	renderboardsMenu();
 	redrawKanban();
-}
-
-function updateLastWorkspace(){
-	window.localStorage.setItem(KANBAN_LAST_BOARD, currentWorkspace);
 }

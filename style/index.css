@@ -1,8 +1,24 @@
+@font-face {
+    font-family: 'droid';
+    src: url('../fonts/DroidSans-webfont.woff') format('woff');        
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'droid';
+    src: url('../fonts/DroidSans-Bold-webfont.woff') format('woff');        
+    font-weight: bold;
+    font-style: normal;
+}
+
 /* General */
 
 html, body, #container { 		
 	margin: 0; 
 	padding: 0;					
+    background-color: #555;
+	font-family: droid;
 }	
 
 #container{
@@ -86,7 +102,8 @@ html, body, #container {
 }
 
 .column{
-	border: 1px solid #CCC;
+	/* border: 2px solid #777; */
+    background: #666;
 	float:left;
 	width: 32%;
 	margin-left: 1%;
@@ -97,6 +114,7 @@ html, body, #container {
 
 .column .header{
 	height: 10%;
+    color: #AAA;
 }
 
 .column .tasksarea{
