@@ -155,8 +155,14 @@ h2,  h3{
 	line-height: 1em;
 }
 
+
+#historyTable td{
+	border-top: 1px solid #333;
+}
+
 #historyTable td, tr{
-	line-height: 1em;	
+	line-height: 1.0em;	
+	padding: 0.3em;
 }
 
 #historyTable td{

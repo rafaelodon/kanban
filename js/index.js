@@ -241,7 +241,7 @@ function onClickRenameWorkspace(){
 	var newWorkspaceName = prompt(message("workspace_rename"));
 	if(newWorkspaceName){		
 		boards[currentBoard] = newWorkspaceName;
-		saveboards();		
+		storage.saveExistingBoardsList(boards);		
 		redrawKanban();
 
 	}
@@ -274,11 +274,19 @@ function onClickTasksHistory(){
 
 	tasksArray.sort(function(a,b){
         if(a.history != 'undefined' && b.history != 'undefined'){
-            return a.history[a.history.length-1].date < b.history[b.history.length-1].date;
-        }else if(a.history){
-            return true;
+			d1 = new Date(a.history[a.history.length-1].date);
+			d2 = new Date(b.history[b.history.length-1].date);			
+			if(d1.getTime() == d2.getTime()){
+				return 0;
+			}else if(d1.getTime() > d2.getTime()){
+				return -1;
+			}else{
+				return 1;
+			}		
+        }else if(a.history != 'undefined'){
+            return 1;
         }else{
-            return false;
+            return 0;
         }
     });
 	
@@ -425,20 +433,22 @@ function onClickBtnImportOk(){
 	    	return false;
 	    }
 
-    	var tasksTemp = JSON.parse($("#inputImportJson").val());
+    	var boardObject = JSON.parse($("#inputImportJson").val());
     	if(confirm(message("confirm_import_tasks"))){
 
 			var boardId = generateBoardId();
-			boards[boardId] = boardName;								
-			saveboards();						
-			currentBoard = { id : boardId, name: workspaceName, tasks : tasksTemp };
-			storage.saveBoard(currentBoard);
-			switchToBoard(currentBoard);
+			currentBoard = { id : boardId, name: boardName, tasks : boardObject["tasks"] };
+			boards.push(currentBoard);			
+			storage.saveBoard(currentBoard);			
+			storage.saveExistingBoardsList(boards);
+						
+			switchToBoard(boardId);
     		hideModals();        		    		
 
     		return true;
     	}
 	} catch (e) {
+		console.log(e)
 		alert(message("error_invalid_json"));
 		$("#labelImportJson").addClass("required");
 		$("#inputImportJson").focus();
