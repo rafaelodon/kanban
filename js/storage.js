@@ -18,7 +18,7 @@ function KanbanStorage() {
 }
 
 KanbanStorage.prototype.saveBoard = function(board) {    
-    console.debug("setItem "+board.id+" => "+JSON.stringify(board));    
+    //console.debug("setItem "+board.id+" => "+JSON.stringify(board));    
     window.localStorage.setItem(board.id, JSON.stringify(board));
 }
 
@@ -26,7 +26,8 @@ KanbanStorage.prototype.removeBoardById = function(boardId){
     window.localStorage.removeItem(boardId);    
 }
 
-KanbanStorage.prototype.saveExistingBoardsList = function(boardList) {    
+KanbanStorage.prototype.saveExistingBoardsList = function(boardList) {        
+    boardList.forEach(b => delete b.tasks);
     window.localStorage.setItem(this.KANBAN_BOARDS, JSON.stringify(boardList));
 }
 
@@ -39,7 +40,7 @@ KanbanStorage.prototype.loadBoardById = function(boardId) {
                 board = new Board(boardId, "New Board", {});
         }
     }	
-    console.debug("getItem "+boardId+" => "+JSON.stringify(board));    
+    //console.debug("getItem "+boardId+" => "+JSON.stringify(board));    
     return board;
 }
 

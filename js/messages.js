@@ -1,7 +1,7 @@
 var MESSAGES = {
-	"workspace_new":"New board name:",
-	"workspace_rename":"Inform a new name to the current board:",	
-	"confirm_workspace_remove":"Removing board {1} and all its tasks. Are you sure?", 
+	"board_new":"New board name:",
+	"board_rename":"Inform a new name to the current board:",	
+	"confirm_board_remove":"Removing board {1} and all its tasks. Are you sure?", 
 	"confirm_remove_task":"Removing task {1}. Are you sure?",
 	"confirm_archive_task":"Archiving task {1}. Are you sure?",
 	"confirm_import_tasks":"All tasks from the JSON below will be imported to a new board. Are you sure?",

@@ -64,9 +64,9 @@ $(function (){
 	bindPressEnter("#inputTaskDescription",onClickBtnTaskOk)
 
 	// boards bindings
-	$('#linkNewWorkspace').click(onClickCreateNewWorkspace);
-	$('#linkRenameWorkspace').click(onClickRenameWorkspace);
-	$('#linkRemoveWorkspace').click(onClickRemoveBoard);
+	$('#linkNewBoard').click(onClickCreateNewBoard);
+	$('#linkRenameBoard').click(onClickRenameBoard);
+	$('#linkRemoveBoard').click(onClickRemoveBoard);
 
 	$('#linkTasksHistory').click(onClickTasksHistory);
 	$('#btnHistoryOk').click(onClickHistoryOk);
@@ -94,23 +94,23 @@ function bindPressEnter(selector,event){
 /* General functions */
 function renderboardsMenu(){
 	if(currentBoard.id == storage.DEFAULT_BOARD_ID){
-		$("#linkRemoveWorkspace").hide();
-		$("#linkRenameWorkspace").hide();
+		$("#linkRemoveBoard").hide();
+		$("#linkRenameBoard").hide();
 	}else{
-		$("#linkRemoveWorkspace").show();
-		$("#linkRenameWorkspace").show();
+		$("#linkRemoveBoard").show();
+		$("#linkRenameBoard").show();
 	}
 
-	$(".liWorkspace").remove();
+	$(".liBoard").remove();
 	boards.forEach(function(board) {
 		var $a = $("<a>", {href: "#", id: board.id});
 		$a.html(board.name);
-		$a.click(onSelectWorkspace);
+		$a.click(onSelectBoard);
 
-		var $li = $("<li>", {class: "liWorkspace"});
+		var $li = $("<li>", {class: "liBoard"});
 		$li.append($a);
 		
-		$("#ulWorkspaces").append($li);
+		$("#ulBoards").append($li);
 	});
 }
 
@@ -218,17 +218,18 @@ function onClickBtnAddTask(){
 	$("#inputTaskTitle").focus();
 }
 
-function onClickCreateNewWorkspace(){	
-	var boardName = prompt(message("workspace_new"));
+function onClickCreateNewBoard(){	
+	var boardName = prompt(message("board_new"));
 	if(boardName){
 		var boardId = generateBoardId();
 
 		var newBoard = { id: boardId, name: boardName, tasks: {}};
-		boards.push(newBoard);		
 		storage.saveBoard(newBoard);
-		storage.saveExistingBoardsList(boards);		
+
+		boards.push(newBoard);				
+		storage.saveExistingBoardsList(boards);
 		
-		renderboardsMenu();		
+		renderboardsMenu();
 		switchToBoard(boardId);
 	}
 }
@@ -237,18 +238,25 @@ function generateBoardId(){
 	return "kanban.boards."+new Date().getTime();
 }
 
-function onClickRenameWorkspace(){	
-	var newWorkspaceName = prompt(message("workspace_rename"));
-	if(newWorkspaceName){		
-		boards[currentBoard] = newWorkspaceName;
-		storage.saveExistingBoardsList(boards);		
-		redrawKanban();
+function onClickRenameBoard(){	
+	var newBoardName = prompt(message("board_rename"));
+	if(newBoardName){		
+		currentBoard.name = newBoardName;
+		storage.saveBoard(currentBoard);
 
+		boards.forEach( function(b) {
+			if(b.id == currentBoard.id){
+				b.name = newBoardName;				
+			}
+		});
+		storage.saveExistingBoardsList(boards);
+		redrawKanban();
+		renderboardsMenu();
 	}
 }
 
 function onClickRemoveBoard(){
-	if(confirm(message("confirm_workspace_remove",boards[currentBoard]))){		
+	if(confirm(message("confirm_board_remove",boards[currentBoard]))){		
 		removeCurrentBoard();
 		renderboardsMenu();
 		switchToBoard(storage.DEFAULT_BOARD_ID);
@@ -257,9 +265,7 @@ function onClickRemoveBoard(){
 
 function removeCurrentBoard(){	
 	storage.removeBoardById(currentBoard.id);
-	boards = boards.filter( function(b) {
-		return b.id != currentBoard.id;
-	});	
+	boards = boards.filter(b => b.id != currentBoard.id);	
 	storage.saveExistingBoardsList(boards);	
 }
 
@@ -394,8 +400,8 @@ function onClickExport(){
 
 function onClickImport(){				
 	
-	$("#inputImportWorkspaceName").val("");
-	$("#labelWorkspaceName").removeClass("required");
+	$("#inputImportBoardName").val("");
+	$("#labelBoardName").removeClass("required");
 
 	$("#inputImportJson").val("");
 	$("#labelImportJson").removeClass("required");
@@ -422,14 +428,14 @@ function onMouseOutTask(){
 
 function onClickBtnImportOk(){
 
-	$("#labelWorkspaceName").removeClass("required");
+	$("#labelBoardName").removeClass("required");
 	$("#labelImportJson").removeClass("required");
 
 	try {
-		var boardName = $("#inputImportWorkspaceName").val();	
+		var boardName = $("#inputImportBoardName").val();	
 		if(boardName.trim() === ''){			
-	    	$("#labelWorkspaceName").addClass("required");
-	    	$("#inputImportWorkspaceName").focus();
+	    	$("#labelBoardName").addClass("required");
+	    	$("#inputImportBoardName").focus();
 	    	return false;
 	    }
 
@@ -463,7 +469,7 @@ function onClickNavbarLink(){
     }
 }
 
-function onSelectWorkspace(){			
+function onSelectBoard(){			
 	switchToBoard($(this).attr("id"));	
 }
 
