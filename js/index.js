@@ -5,7 +5,6 @@
  * Git: https://github.com/rafaelodon/kanban
  *
  */
-
 // Constants
 var DRAG_OPTIONS = {
 	containment: 'window',
@@ -17,6 +16,7 @@ var ELLIPSIS_OPTIONS = {
 	ellipsis : "...",
 	watch: "window"
 };
+var G = 'https://github.com/rafaelodon/kanban';
 
 // Dependencies
 var storage = new KanbanStorage();
@@ -78,7 +78,10 @@ $(function (){
 	currentBoard = storage.loadLastBoard();
 	
 	renderboardsMenu();
-	redrawKanban();		
+	redrawKanban();
+
+	$('#icon').css('cursor', 'pointer');
+	$('#icon').click(function (){window.open(G)});
 });
 
 function bindPressEnter(selector,event){
